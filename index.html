@@ -1,0 +1,2058 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#16161b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="color-scheme" content="dark">
+<title>Таймкоды</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%237c5ce6'/%3E%3Cpath d='M9 10h14M16 10v13' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#16161b;
+  --panel:#1d1d24;
+  --panel2:#25252e;
+  --panel3:#2e2e39;
+  --line:#2c2c36;
+  --line2:#3b3b49;
+  --text:#ebe9f2;
+  --muted:#a3a0b4;
+  --faint:#8b889f;
+  --accent:#b39bff;
+  --accent2:#7c5ce6;
+  --accent-soft:rgba(167,139,250,.14);
+  --accent-line:rgba(167,139,250,.38);
+  --danger:#f4929a;
+  --danger-bg:#a8444e;
+  --ok:#8ad4a9;
+  --warn:#e2b86b;
+  --font:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Roboto","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default;opacity:.5}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:rgba(167,139,250,.35)}
+::-webkit-scrollbar{width:14px;height:14px}
+::-webkit-scrollbar-thumb{background:#3a3a48;border-radius:10px;border:4px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#4a4a5b;border:4px solid transparent;background-clip:padding-box}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+kbd{font:inherit;font-size:12px;padding:1px 6px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;background:var(--panel2);color:var(--muted)}
+
+/* ---------- Каркас ---------- */
+.app{display:grid;grid-template-columns:316px minmax(0,1fr);height:100vh}
+.side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:18px;padding:20px 18px 16px;overflow:auto;min-height:0}
+.main{min-width:0;min-height:0;display:flex;justify-content:center}
+.col{width:100%;max-width:940px;display:flex;flex-direction:column;min-height:0;padding:0 32px}
+
+/* ---------- Боковая панель ---------- */
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:650;letter-spacing:.005em}
+.brand svg{width:28px;height:28px;flex:none}
+.searchbtn{display:flex;align-items:center;gap:10px;width:100%;height:42px;padding:0 12px;border-radius:11px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);text-align:left}
+.searchbtn:hover{border-color:var(--accent-line);color:var(--text)}
+.searchbtn span{flex:1}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cal-title{font-size:16px;font-weight:650}
+.iconbtn{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:9px;border:0;background:transparent;color:var(--muted)}
+.iconbtn:hover{background:var(--panel3);color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dow{font-size:12px;color:var(--faint);text-align:center;padding:4px 0 6px}
+.dow.we{color:#9a86d6}
+.day{height:44px;border-radius:10px;border:1px solid transparent;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.day .n{font-size:14px;line-height:1}
+.day .c{font-size:11px;line-height:11px;height:11px;font-weight:650;color:var(--accent)}
+.day.out .n{color:var(--faint)}
+.day.has{background:rgba(167,139,250,.08)}
+.day:hover{background:var(--panel3)}
+.day.today{border-color:var(--accent-line)}
+.day.today .n{color:var(--accent);font-weight:700}
+.day.sel,.day.sel:hover{background:var(--accent2);border-color:transparent}
+.day.sel .n{color:#fff;font-weight:700}
+.day.sel .c{color:#e7defe}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.databtn{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--text);width:100%;text-align:left}
+.databtn:hover{background:var(--panel2)}
+.backup-status{font-size:12.5px;color:var(--faint);padding:0 4px;line-height:1.4}
+.backup-status.warn{color:var(--warn)}
+
+/* ---------- Синхронизация ---------- */
+.syncbtn{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line2);background:transparent;text-align:left;color:var(--text)}
+.syncbtn:hover{background:var(--panel2)}
+.syncbtn .sdot{width:9px;height:9px;border-radius:50%;background:var(--faint);flex:none}
+.syncbtn.ok .sdot{background:var(--ok)}
+.syncbtn.err .sdot{background:var(--warn)}
+.syncbtn.busy .sdot{background:var(--accent);animation:pulse 1s ease-in-out infinite}
+.syncbtn .st{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.syncbtn .st b{font-weight:600;font-size:14px}
+.syncbtn .st span{font-size:12.5px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.syncbtn.err .st span{color:var(--warn)}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.modal.mid{width:min(680px,100%)}
+.dlg-fixed{padding:12px 18px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px;flex:none}
+.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:18px;color:var(--muted)}
+.steps li::marker{color:var(--accent);font-weight:700}
+.steps b{color:var(--text)}
+.inline-actions{margin-top:10px}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.field label{font-size:13px;color:var(--muted)}
+.field input{height:40px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);padding:0 12px;outline:0;min-width:0;width:100%}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field .row2{display:flex;gap:8px}
+.field .row2 .btn{flex:none}
+pre.sql{max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:12.5px/1.5 Consolas,"Cascadia Mono",monospace;color:var(--muted);margin:8px 0 0;user-select:text}
+details summary{cursor:pointer;color:var(--accent);font-size:13.5px;margin-top:10px}
+.codebox{font-family:Consolas,"Cascadia Mono",monospace;letter-spacing:.04em}
+.linkbtn{border:0;background:transparent;color:var(--accent);text-decoration:underline;padding:0 0 0 6px;font-size:inherit}
+
+/* ---------- Шапка дня ---------- */
+.banner{margin-top:16px;padding:12px 14px;border-radius:10px;border:1px solid rgba(244,146,154,.45);background:rgba(168,68,78,.18);color:#ffd3d6;font-size:14px}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 20px;padding-top:26px}
+.head h1{margin:0;font-size:30px;line-height:1.1;font-weight:650;letter-spacing:-.012em}
+.head h1 .year{color:var(--faint);font-weight:500;margin-left:6px}
+.subline{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin-top:8px;color:var(--muted);font-size:14px}
+.rel{padding:1px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600}
+.rel.now{background:rgba(138,212,169,.14);color:var(--ok)}
+.head-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.navgrp{display:inline-flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px}
+.navgrp .iconbtn{width:32px;height:32px}
+.todaybtn{border:0;background:transparent;height:32px;padding:0 12px;border-radius:8px;color:var(--text);font-size:14px}
+.todaybtn:hover{background:var(--panel3)}
+.todaybtn[aria-current=true]{color:var(--accent)}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button{border:0;background:transparent;color:var(--muted);padding:0 12px;height:32px;border-radius:8px;font-size:13.5px}
+.seg button:hover{color:var(--text)}
+.seg button[aria-checked=true]{background:var(--panel3);color:var(--text)}
+
+/* ---------- Строка добавления ---------- */
+.addwrap{padding-top:20px}
+.addbar{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:6px 6px 6px 8px;transition:border-color .15s,box-shadow .15s}
+.addbar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.addbar.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(244,146,154,.12)}
+.addbar input{background:transparent;border:0;outline:0;min-width:0;padding:0 10px;height:50px}
+#tc{width:138px;flex:none;font-size:25px;font-weight:650;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+#tc::placeholder{color:#6f6a8f;font-weight:500}
+.addbar .vsep{width:1px;height:28px;background:var(--line2);flex:none}
+#desc{flex:1;font-size:17px}
+#desc::placeholder,#tc::placeholder{opacity:1}
+#desc::placeholder{color:#7b7890}
+.addbtn{width:50px;height:50px;flex:none;border-radius:11px;border:0;background:var(--accent2);color:#fff;display:grid;place-items:center}
+.addbtn:hover{background:#8b6cf0}
+.addbtn:active{transform:scale(.97)}
+.addbtn svg{width:22px;height:22px;stroke-width:2.2}
+.hintrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:30px;padding:8px 6px 0;font-size:13px;color:var(--faint)}
+.hintrow .hint{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
+.hintrow .hint span{display:inline-flex;align-items:center;gap:6px}
+.hintrow .errmsg{color:var(--danger);font-size:13.5px}
+.saved{display:inline-flex;align-items:center;gap:6px;color:var(--ok);opacity:0;transform:translateY(2px);transition:opacity .18s,transform .18s;white-space:nowrap;font-weight:600}
+.saved.on{opacity:1;transform:none}
+.saved svg{width:16px;height:16px;stroke-width:2.4}
+
+/* ---------- Список ---------- */
+.list{flex:1;min-height:0;overflow:auto;margin:10px -14px 0;padding:0 14px 32px}
+.row{display:grid;grid-template-columns:96px minmax(0,1fr) 136px;gap:14px;align-items:start;padding:9px 10px 9px 8px;border-radius:12px;border:1px solid transparent;content-visibility:auto;contain-intrinsic-size:auto 48px}
+.list.wide .row{grid-template-columns:118px minmax(0,1fr) 136px}
+.row:focus{outline:none}
+.row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.row:hover,.row:focus-within{background:var(--panel)}
+.row .chip{justify-self:start;padding:3px 11px;border-radius:9px;background:var(--accent-soft);color:var(--accent);font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.35;user-select:text}
+.row .txt{padding:4px 0;font-size:16px;overflow-wrap:anywhere;white-space:pre-wrap}
+.row .nodesc{color:var(--faint);font-style:italic;font-size:14.5px}
+.row .actions{display:flex;gap:2px;justify-content:flex-end}
+.row .actions .iconbtn{width:32px;height:32px}
+.row .actions .iconbtn.del:hover{color:var(--danger)}
+.row.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:rgba(167,139,250,.34);border-color:var(--accent-line)}100%{background:transparent;border-color:transparent}}
+.row.editing{background:var(--panel);border-color:var(--accent-line);grid-template-columns:132px minmax(0,1fr) auto}
+.row.editing input{background:var(--panel2);border:1px solid var(--line2);border-radius:9px;height:38px;padding:0 10px;outline:0;min-width:0;width:100%}
+.row.editing input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.row.editing .e-tc{color:var(--accent);font-weight:650;font-size:17px;font-variant-numeric:tabular-nums}
+.row.editing .e-tc.bad{border-color:var(--danger)}
+.row.editing .e-err{grid-column:1/-1;color:var(--danger);font-size:13.5px;padding-left:2px}
+.empty{padding:56px 12px;text-align:center;color:var(--muted)}
+.empty b{display:block;font-size:18px;color:var(--text);font-weight:600;margin-bottom:8px}
+.empty small{font-size:14px;color:var(--faint)}
+
+/* ---------- Окна ---------- */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(9,9,13,.68);display:flex;justify-content:center;align-items:flex-start;padding:10vh 16px 16px}
+.overlay[hidden]{display:none}
+.modal{width:min(720px,100%);max-height:80vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.5);overflow:hidden}
+.modal.narrow{width:min(580px,100%)}
+.s-top{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--muted)}
+.s-top input{flex:1;background:transparent;border:0;outline:0;font-size:18px;color:var(--text);min-width:0}
+.s-top input::placeholder{color:#7b7890}
+.s-res{overflow:auto;padding:8px;min-height:60px}
+.s-info{padding:26px 16px;text-align:center;color:var(--muted);font-size:14.5px}
+.s-count{padding:6px 10px 8px;color:var(--faint);font-size:13px}
+.res{display:grid;grid-template-columns:104px 86px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;text-align:left;padding:9px 10px;border-radius:10px;border:0;background:transparent}
+.res:hover,.res.sel{background:var(--panel3)}
+.res .d{color:var(--muted);font-size:13.5px}
+.res .t{color:var(--accent);font-weight:650;font-variant-numeric:tabular-nums}
+.res .x{overflow-wrap:anywhere}
+.res mark{background:rgba(167,139,250,.32);color:#fff;border-radius:4px;padding:0 2px}
+.s-foot{display:flex;gap:18px;padding:10px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint)}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 6px}
+.dlg-head h2{margin:0;font-size:19px;font-weight:650}
+.dlg-body{padding:8px 18px 18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.dlg-body p{margin:0;color:var(--muted)}
+.dlg-body b{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:14.5px}
+.btn:hover{background:var(--panel3)}
+.btn.primary{background:var(--accent2);border-color:transparent;color:#fff}
+.btn.primary:hover{background:#8b6cf0}
+.btn.danger{background:var(--danger-bg);border-color:transparent;color:#fff}
+.btn.danger:hover{background:#b9525c}
+.dlg-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dlg-actions .btn{justify-content:flex-start}
+.dlg-actions .wide{grid-column:1/-1}
+.note{font-size:13.5px;color:var(--faint);line-height:1.5;border-top:1px solid var(--line);padding-top:14px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:10px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{flex:1;min-width:120px;padding:10px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.stat b{display:block;font-size:22px;font-weight:650}
+.stat span{font-size:13px;color:var(--muted)}
+.radio{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line2);border-radius:12px;cursor:pointer}
+.radio:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.radio input{margin-top:4px;accent-color:#9b7cf5}
+.radio span{color:var(--muted);font-size:14.5px}
+.check{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14.5px}
+.check input{accent-color:#9b7cf5;width:16px;height:16px}
+.warnbox{padding:12px 14px;border-radius:10px;border:1px solid rgba(244,146,154,.45);background:rgba(168,68,78,.16);color:#ffd3d6;font-size:14.5px}
+.issues{font-size:13px;color:var(--faint);margin:0;padding-left:18px}
+
+/* ---------- Уведомления ---------- */
+.toasts{position:fixed;right:22px;bottom:22px;z-index:80;display:flex;flex-direction:column;gap:10px;align-items:flex-end;pointer-events:none;max-width:min(460px,calc(100vw - 32px))}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:12px;background:var(--panel3);border:1px solid var(--line2);box-shadow:0 14px 40px rgba(0,0,0,.45);animation:tin .18s ease-out;font-size:14.5px}
+.toast.error{border-color:rgba(244,146,154,.55);background:#3a2428}
+.toast.ok{border-color:rgba(138,212,169,.4)}
+.toast span{overflow-wrap:anywhere}
+.toast button{border:0;background:transparent;color:var(--accent);font-weight:650;padding:4px 6px;border-radius:7px;white-space:nowrap}
+.toast button:hover{background:rgba(167,139,250,.16)}
+.toast.error button{color:#ffd3d6}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- Телефон и очень узкие окна ---------- */
+html,body{overscroll-behavior:none}
+button,.row,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.side-close,.head-mobile{display:none}
+@media (max-width:760px), (max-height:520px) and (pointer:coarse){
+  .app{display:block;height:100vh;height:100dvh}
+  .main{height:100%;min-height:0}
+  .col{padding:0 14px;max-width:none;height:100%}
+  .side{display:none;position:fixed;inset:0;z-index:40;border-right:0;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+  body.side-open .side{display:flex}
+  .side-close{display:grid;margin-left:auto}
+  .head{order:1;padding-top:max(12px,env(safe-area-inset-top));gap:10px}
+  .head > div:first-child{flex:1;min-width:0}
+  .head h1{font-size:24px}
+  .head h1 .year{font-size:.8em}
+  .head-mobile{display:flex;gap:2px}
+  .head-actions{width:100%;justify-content:space-between}
+  .banner{order:0}
+  .list{order:2;margin:6px -14px 0;padding:0 14px 12px}
+  .addwrap{order:3;display:flex;flex-direction:column-reverse;padding:4px 0 max(10px,env(safe-area-inset-bottom));background:var(--bg)}
+  .hint > span:not(.errmsg){display:none}
+  .hintrow{min-height:0;padding:0 4px 6px}
+  .addbar{padding:5px 5px 5px 4px}
+  #tc{width:104px;font-size:22px;height:48px}
+  #desc{font-size:16px;height:48px}
+  .addbtn{width:48px;height:48px}
+  .toasts{left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));align-items:stretch;max-width:none}
+  .toast{justify-content:space-between}
+  .overlay{padding:max(2vh,env(safe-area-inset-top)) 8px 8px}
+  .modal,.modal.narrow,.modal.mid{max-height:96dvh}
+  .res{grid-template-columns:76px 66px minmax(0,1fr)}
+  .dlg-actions{grid-template-columns:1fr}
+  .list .row.editing,.list.wide .row.editing{grid-template-columns:minmax(0,1fr) auto}
+  .row.editing .e-text{grid-column:1/-1;grid-row:2}
+  .row.editing .actions{grid-column:2;grid-row:1}
+  .row.editing .e-err{grid-row:3}
+  .day{height:48px}
+}
+/* Сенсорные экраны: кнопки действий открываются под записью по нажатию, цели крупнее */
+@media (hover:none){
+  .searchbtn kbd{display:none}
+  .list .row,.list.wide .row{grid-template-columns:auto minmax(0,1fr)}
+  .row .actions{grid-column:1/-1;justify-content:flex-start;gap:8px;padding:8px 0 2px}
+  .row .actions .iconbtn{width:46px;height:46px;background:var(--panel2);border:1px solid var(--line2)}
+  .iconbtn{width:42px;height:42px}
+  .list .row.editing,.list.wide .row.editing{grid-template-columns:minmax(0,1fr) auto}
+  .row.editing .actions{grid-column:2;grid-row:1;padding:0}
+  .row.editing .actions .iconbtn{width:42px;height:42px;border:0;background:transparent}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .row.flash{animation:none;background:rgba(167,139,250,.28)}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <aside class="side">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#7c5ce6"/><path d="M9 10h14M16 10v13" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>Таймкоды</span>
+      <button type="button" class="iconbtn side-close" id="btnSideClose" aria-label="Закрыть календарь"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <button class="searchbtn" id="btnSearch" title="Поиск по всем записям (Ctrl+F)">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span>Поиск по записям</span><kbd>Ctrl+F</kbd>
+    </button>
+    <section id="cal" aria-label="Календарь"></section>
+    <div class="side-foot">
+      <button class="syncbtn off" id="btnSync" type="button" title="Синхронизация между компьютерами"></button>
+      <button class="databtn" id="btnData" title="Резервная копия, экспорт и восстановление">
+        <svg class="i" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        Данные и резервная копия
+      </button>
+      <div class="backup-status" id="backupStatus"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="col">
+      <div class="banner" id="banner" hidden role="alert"></div>
+      <header class="head" id="head"></header>
+      <div class="addwrap">
+        <div class="addbar" id="addbar">
+          <input id="tc" type="text" inputmode="decimal" enterkeyhint="next" autocapitalize="off" autocomplete="off" spellcheck="false" maxlength="12" placeholder="0:00" aria-label="Таймкод" title="Таймкод: 1:46, 1.46 или 1:12:35">
+          <span class="vsep"></span>
+          <input id="desc" type="text" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="1000" placeholder="Что происходит в этот момент" aria-label="Описание момента">
+          <button class="addbtn" id="btnAdd" title="Добавить (Enter)" aria-label="Добавить таймкод">
+            <svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="hintrow">
+          <div class="hint" id="hint"></div>
+          <div class="saved" id="saved" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="list" id="list" role="list"></div>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" hidden></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+(() => {
+
+/* =====================================================================
+   Вспомогательное
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MON_SHORT = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+const DOW = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = (n, l = 2) => String(n).padStart(l, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseISO = s => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return dt;
+};
+const todayISO = () => iso(new Date());
+const addDays = (s, n) => { const d = parseISO(s); d.setDate(d.getDate() + n); return iso(d); };
+const dayDiff = (a, b) => {
+  const A = parseISO(a), B = parseISO(b);
+  return Math.round((Date.UTC(B.getFullYear(), B.getMonth(), B.getDate()) - Date.UTC(A.getFullYear(), A.getMonth(), A.getDate())) / 864e5);
+};
+const plural = (n, one, few, many) => {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b === 1) return one;
+  if (b >= 2 && b <= 4) return few;
+  return many;
+};
+const countText = n => n === 0 ? 'Нет таймкодов' : `${n} ${plural(n, 'таймкод', 'таймкода', 'таймкодов')}`;
+const longDate = s => { const d = parseISO(s); return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}`; };
+const shortDate = s => { const d = parseISO(s); return `${d.getDate()} ${MON_SHORT[d.getMonth()]} ${d.getFullYear()}`; };
+const norm = s => String(s).toLowerCase().replace(/ё/g, 'е');
+const newId = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+  : Date.now().toString(36) + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+const hash53 = (str) => {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+};
+
+const ICONS = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  left: '<path d="m15 18-6-6 6-6"/>',
+  right: '<path d="m9 18 6-6-6-6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+  up: '<path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/>',
+  file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/>'
+};
+const ic = (n, extra = '') => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${ICONS[n]}</svg>`;
+
+/* =====================================================================
+   Разбор таймкода: 1:46 · 01:46 · 1.46 · 01.46 · 1,46 · 1:12:35
+   Ничего не угадываем: сомнительный ввод — понятная ошибка.
+   ===================================================================== */
+function parseTimecode(raw) {
+  const shown = String(raw).trim();
+  const s = shown.replace(/\s+/g, '');
+  const bad = msg => ({ ok: false, msg });
+  if (!s) return { ok: false, empty: true, msg: 'Введи таймкод, например 1:46' };
+  if (!/^\d+([:.,]\d+){1,2}$/.test(s)) return bad(`Не понял «${shown}». Пример: 1:46 или 1:12:35`);
+  const p = s.split(/[:.,]/);
+  let h = 0, m, sec;
+  if (p.length === 2) {
+    [m, sec] = p;
+    if (m.length > 2 || +m > 59) return bad('Минут больше 59. Для длинных видео вводи часы: 1:05:30');
+    if (sec.length !== 2) return bad('Секунды — две цифры, например 1:05');
+    if (+sec > 59) return bad('В минуте только 59 секунд. Проверь ввод');
+  } else {
+    [h, m, sec] = p;
+    if (h.length > 2) return bad('Часы — одна или две цифры, например 1:05:30');
+    if (m.length !== 2 || sec.length !== 2) return bad('Минуты и секунды — по две цифры, например 1:05:30');
+    if (+m > 59 || +sec > 59) return bad('Минуты и секунды не больше 59');
+  }
+  const total = (+h) * 3600 + (+m) * 60 + (+sec);
+  const tc = p.length === 3 ? `${pad(+h)}:${m}:${sec}` : `${pad(+m)}:${sec}`;
+  return { ok: true, sec: total, tc };
+}
+
+/* =====================================================================
+   Хранилище (IndexedDB). Каждая запись — отдельный объект со своим id.
+   ===================================================================== */
+const DB_NAME = 'timecode-notes', DB_VER = 2;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) return reject(new Error('в этом браузере нет встроенной базы данных'));
+    let req;
+    try { req = indexedDB.open(DB_NAME, DB_VER); } catch (e) { return reject(e); }
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if (!d.objectStoreNames.contains('entries')) {
+        const s = d.createObjectStore('entries', { keyPath: 'id' });
+        s.createIndex('date', 'date');
+      }
+      if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', { keyPath: 'key' });
+      if (!d.objectStoreNames.contains('sync_queue')) d.createObjectStore('sync_queue', { keyPath: 'id' });
+    };
+    req.onsuccess = () => {
+      const d = req.result;
+      d.onversionchange = () => { d.close(); markStorageBroken('база данных была закрыта другим окном. Перезапусти приложение'); };
+      resolve(d);
+    };
+    req.onerror = () => reject(req.error || new Error('не удалось открыть базу'));
+    req.onblocked = () => reject(new Error('база занята другим окном'));
+  });
+}
+function txRun(stores, mode, work) {
+  return new Promise((resolve, reject) => {
+    let t;
+    try { t = db.transaction(stores, mode, { durability: 'strict' }); } catch (e) { return reject(e); }
+    let out;
+    t.oncomplete = () => resolve(out);
+    t.onabort = () => reject(t.error || new Error('запись отменена'));
+    try { out = work(t); } catch (e) { try { t.abort(); } catch (_) {} reject(e); }
+  });
+}
+/* Если включена синхронизация, каждое изменение записи кладётся в очередь «что отправить на сервер»
+   в той же транзакции, что и сама запись, поэтому они не могут разойтись. */
+const STORES = ['entries', 'sync_queue'];
+const stampOf = e => e.updatedAt || e.createdAt;
+const dbPut = e => txRun(STORES, 'readwrite', t => {
+  t.objectStore('entries').put(e);
+  if (state.sync) t.objectStore('sync_queue').put({ id: e.id, op: 'upsert', t: stampOf(e) });
+});
+const dbDel = (e, at) => txRun(STORES, 'readwrite', t => {
+  t.objectStore('entries').delete(e.id);
+  if (state.sync) t.objectStore('sync_queue').put({ id: e.id, op: 'delete', t: at, entry: e });
+});
+const dbPutMany = list => txRun(STORES, 'readwrite', t => {
+  const s = t.objectStore('entries'), q = state.sync ? t.objectStore('sync_queue') : null;
+  for (const e of list) { s.put(e); if (q) q.put({ id: e.id, op: 'upsert', t: stampOf(e) }); }
+});
+const dbReplaceAll = (list, oldList, at) => txRun(STORES, 'readwrite', t => {
+  const s = t.objectStore('entries');
+  s.clear();
+  for (const e of list) s.put(e);
+  if (state.sync) {
+    const q = t.objectStore('sync_queue');
+    q.clear();
+    const keep = new Set(list.map(e => e.id));
+    for (const o of oldList) if (!keep.has(o.id)) q.put({ id: o.id, op: 'delete', t: at, entry: o });
+    for (const e of list) q.put({ id: e.id, op: 'upsert', t: stampOf(e) });
+  }
+});
+function dbGetAll() {
+  return new Promise((resolve, reject) => {
+    let t;
+    try { t = db.transaction('entries', 'readonly'); } catch (e) { return reject(e); }
+    const r = t.objectStore('entries').getAll();
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+    t.onabort = () => reject(t.error);
+  });
+}
+function dbGetMeta() {
+  return new Promise((resolve, reject) => {
+    try {
+      const t = db.transaction('meta', 'readonly');
+      const r = t.objectStore('meta').getAll();
+      r.onsuccess = () => { const o = {}; for (const row of r.result) o[row.key] = row.value; resolve(o); };
+      r.onerror = () => reject(r.error);
+    } catch (e) { reject(e); }
+  });
+}
+const dbSetMeta = (key, value) => txRun('meta', 'readwrite', t => { t.objectStore('meta').put({ key, value }); });
+
+/* =====================================================================
+   Состояние
+   ===================================================================== */
+const byId = new Map();     // id -> запись
+const byDate = new Map();   // 'YYYY-MM-DD' -> Set(id)
+const normCache = new Map();
+const now0 = new Date();
+const state = {
+  storageOk: false, storageErr: '',
+  today: todayISO(),
+  selected: todayISO(),
+  viewY: now0.getFullYear(), viewM: now0.getMonth(),
+  sort: 'tc',
+  edit: null,
+  undo: [],
+  overlay: null,
+  flashId: null,
+  meta: {},
+  pending: 0,
+  lastStamp: 0,
+  persisted: null,
+  sig: ''
+};
+
+function idxPut(e) {
+  const old = byId.get(e.id);
+  if (old && old.date !== e.date) { const s = byDate.get(old.date); if (s) { s.delete(e.id); if (!s.size) byDate.delete(old.date); } }
+  byId.set(e.id, e);
+  let s = byDate.get(e.date);
+  if (!s) { s = new Set(); byDate.set(e.date, s); }
+  s.add(e.id);
+  normCache.delete(e.id);
+}
+function idxDel(id) {
+  const e = byId.get(id);
+  if (!e) return;
+  byId.delete(id);
+  const s = byDate.get(e.date);
+  if (s) { s.delete(id); if (!s.size) byDate.delete(e.date); }
+  normCache.delete(id);
+}
+function idxReset(list) {
+  byId.clear(); byDate.clear(); normCache.clear();
+  for (const e of list) idxPut(e);
+}
+const countOn = d => (byDate.get(d) || { size: 0 }).size;
+const entriesOn = d => { const s = byDate.get(d); return s ? [...s].map(id => byId.get(id)) : []; };
+const nextStamp = () => (state.lastStamp = Math.max(Date.now(), state.lastStamp + 1));
+const signature = () => {
+  let max = 0, sum = 0;
+  for (const e of byId.values()) { const v = e.updatedAt || e.createdAt; if (v > max) max = v; sum = (sum + v) % 1e9; }
+  return `${byId.size}|${max}|${sum}`;
+};
+
+function sortedOn(date) {
+  const arr = entriesOn(date);
+  const cmpAdded = (a, b) => (a.createdAt - b.createdAt) || (a.id < b.id ? -1 : 1);
+  if (state.sort === 'tc') arr.sort((a, b) => (a.sec - b.sec) || cmpAdded(a, b));
+  else if (state.sort === 'new') arr.sort((a, b) => cmpAdded(b, a));
+  else arr.sort(cmpAdded);
+  return arr;
+}
+
+/* =====================================================================
+   Уведомления
+   ===================================================================== */
+const toastsEl = $('#toasts');
+function clearToasts({ keepSticky = true } = {}) {
+  for (const el of [...toastsEl.children]) if (!(keepSticky && el.dataset.sticky)) el.remove();
+}
+function toast(msg, { kind = 'info', ms, action = null } = {}) {
+  const duration = ms !== undefined ? ms : (kind === 'error' ? 0 : 3200);   // ошибки без срока — «залипают»
+  const el = document.createElement('div');
+  el.className = 'toast ' + kind;
+  if (kind === 'error' && !duration) el.dataset.sticky = '1';
+  el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  const sp = document.createElement('span'); sp.textContent = msg; el.append(sp);
+  let timer = null;
+  const close = () => { clearTimeout(timer); el.remove(); };
+  if (action) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = action.label;
+    b.onclick = () => { close(); action.fn(); };
+    el.append(b);
+  }
+  if (kind === 'error') {
+    const x = document.createElement('button'); x.type = 'button'; x.setAttribute('aria-label', 'Закрыть'); x.innerHTML = ic('x'); x.onclick = close; el.append(x);
+  }
+  if (duration) timer = setTimeout(close, duration);
+  while (toastsEl.children.length >= 4) toastsEl.firstChild.remove();
+  toastsEl.append(el);
+  return close;
+}
+const reasonOf = err => {
+  const m = err && (err.message || err.name) ? (err.message || err.name) : 'неизвестная ошибка';
+  return m.length > 140 ? m.slice(0, 140) + '…' : m;
+};
+function markStorageBroken(reason) {
+  state.storageOk = false; state.storageErr = reason;
+  renderBanner();
+}
+
+/* =====================================================================
+   Отрисовка
+   ===================================================================== */
+const els = {
+  cal: $('#cal'), head: $('#head'), list: $('#list'), tc: $('#tc'), desc: $('#desc'), addbar: $('#addbar'),
+  hint: $('#hint'), saved: $('#saved'), banner: $('#banner'), backup: $('#backupStatus'), overlay: $('#overlay'), app: $('#app')
+};
+
+const COARSE = !!(window.matchMedia && matchMedia('(pointer:coarse)').matches);
+const focusTc = () => { if (!COARSE) els.tc.focus(); };   // на телефоне не вызываем клавиатуру без необходимости
+
+/* Шторка с календарём (на телефоне) и кнопка «Назад» системы */
+let backDepth = 0, ignorePop = 0, keepEntry = false;
+/* Один слой интерфейса (шторка или окно) = одна запись в истории браузера, поэтому «Назад» закрывает слой.
+   При переходе слой→слой запись переиспользуется (keepEntry), чтобы не гонять back() и pushState одновременно. */
+function pushBack() {
+  if (!COARSE) return;
+  if (keepEntry) { keepEntry = false; return; }
+  try { history.pushState({ ov: 1 }, ''); backDepth++; } catch (_) {}
+}
+function popBack() { if (!COARSE || backDepth <= 0) return; backDepth--; ignorePop++; try { history.back(); } catch (_) { ignorePop--; } }
+function releaseEntry(fromPop, keep) {
+  if (fromPop) return;
+  if (keep && COARSE && backDepth > 0) keepEntry = true; else popBack();
+}
+const sideOpen = () => document.body.classList.contains('side-open');
+function openSide() { if (sideOpen()) return; document.body.classList.add('side-open'); pushBack(); }
+function closeSide(fromPop, keep) { if (!sideOpen()) return false; document.body.classList.remove('side-open'); releaseEntry(fromPop, keep); return true; }
+window.addEventListener('popstate', () => {
+  if (ignorePop > 0) { ignorePop--; return; }
+  if (backDepth > 0) {
+    backDepth--;
+    if (state.overlay) closeOverlay(true); else if (sideOpen()) closeSide(true);
+  }
+});
+
+function renderBanner() {
+  if (state.storageOk) { els.banner.hidden = true; }
+  else {
+    els.banner.hidden = false;
+    els.banner.textContent = `Хранилище недоступно: ${state.storageErr || 'неизвестная причина'}. Записи сейчас НЕ сохраняются. Закрой окно и открой приложение через ярлык (не в режиме InPrivate).`;
+  }
+  els.tc.disabled = els.desc.disabled = $('#btnAdd').disabled = !state.storageOk;
+}
+
+function renderCalendar() {
+  const y = state.viewY, m = state.viewM;
+  const first = new Date(y, m, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const start = new Date(y, m, 1 - offset);
+  const selDate = parseISO(state.selected);
+  const selVisible = selDate && selDate.getFullYear() === y && selDate.getMonth() === m;
+  let cells = '';
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const key = iso(d);
+    const n = countOn(key);
+    const cls = ['day'];
+    if (d.getMonth() !== m) cls.push('out');
+    if (n) cls.push('has');
+    if (key === state.today) cls.push('today');
+    if (key === state.selected) cls.push('sel');
+    const tab = (key === state.selected && selVisible) || (!selVisible && d.getMonth() === m && d.getDate() === 1) ? 0 : -1;
+    const label = `${longDate(key)}, ${countText(n).toLowerCase()}`;
+    cells += `<button type="button" class="${cls.join(' ')}" data-date="${key}" tabindex="${tab}" aria-label="${label}" aria-pressed="${key === state.selected}"><span class="n">${d.getDate()}</span><span class="c">${n ? (n > 99 ? '99+' : n) : ''}</span></button>`;
+  }
+  els.cal.innerHTML = `
+    <div class="cal-head">
+      <button type="button" class="iconbtn" data-cal="prev" aria-label="Предыдущий месяц" title="Предыдущий месяц">${ic('left')}</button>
+      <div class="cal-title" aria-live="polite">${MONTHS[m]} ${y}</div>
+      <button type="button" class="iconbtn" data-cal="next" aria-label="Следующий месяц" title="Следующий месяц">${ic('right')}</button>
+    </div>
+    <div class="cal-grid" id="calGrid">
+      ${DOW.map((d, i) => `<div class="dow${i > 4 ? ' we' : ''}">${d}</div>`).join('')}
+      ${cells}
+    </div>`;
+}
+
+function relLabel() {
+  const diff = dayDiff(state.today, state.selected);
+  if (diff === 0) return { t: 'сегодня', now: true };
+  if (diff === -1) return { t: 'вчера' };
+  if (diff === 1) return { t: 'завтра' };
+  if (Math.abs(diff) > 99) return null;
+  const a = Math.abs(diff);
+  const w = plural(a, 'день', 'дня', 'дней');
+  return { t: diff < 0 ? `${a} ${w} назад` : `через ${a} ${w}` };
+}
+
+function renderHead() {
+  const d = parseISO(state.selected);
+  const rel = relLabel();
+  const n = countOn(state.selected);
+  const isToday = state.selected === state.today;
+  els.head.innerHTML = `
+    <div>
+      <h1>${d.getDate()} ${MONTHS_GEN[d.getMonth()]}<span class="year">${d.getFullYear()}</span></h1>
+      <div class="subline">
+        <span>${WEEKDAYS[d.getDay()]}</span>
+        ${rel ? `<span class="rel${rel.now ? ' now' : ''}">${rel.t}</span>` : ''}
+        <span>${countText(n)}</span>
+      </div>
+    </div>
+    <div class="head-mobile">
+      <button type="button" class="iconbtn" data-mob="cal" aria-label="Календарь и меню" title="Календарь и меню">${ic('cal')}</button>
+      <button type="button" class="iconbtn" data-mob="search" aria-label="Поиск" title="Поиск">${ic('search')}</button>
+    </div>
+    <div class="head-actions">
+      <div class="navgrp">
+        <button type="button" class="iconbtn" data-nav="-1" aria-label="Предыдущий день" title="Предыдущий день (Alt+←)">${ic('left')}</button>
+        <button type="button" class="todaybtn" data-nav="today" aria-current="${isToday}" title="Перейти к сегодняшнему дню">Сегодня</button>
+        <button type="button" class="iconbtn" data-nav="1" aria-label="Следующий день" title="Следующий день (Alt+→)">${ic('right')}</button>
+      </div>
+      <div class="seg" role="radiogroup" aria-label="Сортировка">
+        <button type="button" role="radio" data-sort="tc" aria-checked="${state.sort === 'tc'}" title="От меньшего таймкода к большему">По таймкоду</button>
+        <button type="button" role="radio" data-sort="new" aria-checked="${state.sort === 'new'}" title="Последние добавленные — сверху">Новые сверху</button>
+        <button type="button" role="radio" data-sort="old" aria-checked="${state.sort === 'old'}" title="Первые добавленные — сверху">Старые сверху</button>
+      </div>
+    </div>`;
+}
+
+function rowHTML(e) {
+  const id = esc(e.id);
+  if (state.edit && state.edit.id === e.id) {
+    const ed = state.edit;
+    return `<div class="row editing" role="listitem" data-id="${id}">
+      <input class="e-tc${ed.err ? ' bad' : ''}" data-f="tc" value="${esc(ed.tc)}" maxlength="12" spellcheck="false" autocomplete="off" aria-label="Таймкод">
+      <input class="e-text" data-f="text" value="${esc(ed.text)}" maxlength="1000" spellcheck="false" autocomplete="off" aria-label="Описание">
+      <div class="actions">
+        <button type="button" class="iconbtn" data-act="save-edit" title="Сохранить (Enter)" aria-label="Сохранить">${ic('check')}</button>
+        <button type="button" class="iconbtn" data-act="cancel-edit" title="Отмена (Esc)" aria-label="Отменить изменения">${ic('x')}</button>
+      </div>
+      <div class="e-err" ${ed.err ? '' : 'hidden'}>${esc(ed.err || '')}</div>
+    </div>`;
+  }
+  return `<div class="row" role="listitem" tabindex="-1" data-id="${id}"><div class="chip" title="Двойной щелчок — изменить">${esc(e.tc)}</div><div class="txt">${e.text ? esc(e.text) : '<span class="nodesc">без описания</span>'}</div></div>`;
+}
+
+/* Кнопки действий существуют в единственном экземпляре и «переезжают» в строку под курсором/фокусом.
+   Так список из тысяч записей остаётся лёгким. */
+const tools = document.createElement('div');
+tools.className = 'actions';
+tools.innerHTML = `
+  <button type="button" class="iconbtn" data-act="copy-tc" title="Копировать таймкод" aria-label="Копировать таймкод">${ic('clock')}</button>
+  <button type="button" class="iconbtn" data-act="copy-full" title="Копировать таймкод с описанием" aria-label="Копировать таймкод с описанием">${ic('copy')}</button>
+  <button type="button" class="iconbtn" data-act="edit" title="Изменить (Enter)" aria-label="Изменить">${ic('edit')}</button>
+  <button type="button" class="iconbtn del" data-act="delete" title="Удалить (Delete), можно отменить" aria-label="Удалить">${ic('trash')}</button>`;
+function moveTools(row) {
+  if (!row || row.classList.contains('editing') || tools.parentNode === row) return;
+  if (tools.contains(document.activeElement)) return;
+  row.append(tools);
+}
+const nodeFromHTML = html => { const t = document.createElement('template'); t.innerHTML = html; return t.content.firstElementChild; };
+
+function findRow(id) {
+  for (const r of els.list.children) if (r.dataset && r.dataset.id === id) return r;
+  return null;
+}
+
+function ensureTabStop() {
+  if (els.list.querySelector('.row[tabindex="0"]')) return;
+  const first = els.list.querySelector('.row:not(.editing)');
+  if (first) first.tabIndex = 0;
+}
+
+function flashRow(id, center) {
+  const row = findRow(id);
+  if (!row) return;
+  row.scrollIntoView({ block: center ? 'center' : 'nearest' });
+  row.classList.add('flash');
+  setTimeout(() => row.classList.remove('flash'), 1700);
+}
+
+function renderList({ keepScroll = true } = {}) {
+  const arr = sortedOn(state.selected);
+  const top = els.list.scrollTop;
+  tools.remove();
+  els.list.classList.toggle('wide', arr.some(e => e.tc.length > 5));
+  if (!arr.length) {
+    els.list.innerHTML = `<div class="empty"><b>Пока нет таймкодов. Добавь первый выше.</b><small>Таймкод можно вводить как 1.46, 1:46 или 1:12:35.</small></div>`;
+  } else {
+    els.list.innerHTML = arr.map(rowHTML).join('');
+  }
+  els.list.scrollTop = keepScroll ? top : 0;
+  ensureTabStop();
+  if (state.flashId) {
+    const id = state.flashId, center = state.flashCenter;
+    state.flashId = null; state.flashCenter = false;
+    flashRow(id, center);
+  }
+}
+
+/* Точечное обновление одной строки без перерисовки всего списка */
+function syncRow(id) {
+  const old = findRow(id);
+  if (old) { if (tools.parentNode === old) tools.remove(); old.remove(); }
+  const e = byId.get(id);
+  if (e && e.date === state.selected) {
+    if (!els.list.querySelector('.row')) { renderList(); return; }
+    const idx = sortedOn(state.selected).findIndex(x => x.id === id);
+    els.list.insertBefore(nodeFromHTML(rowHTML(e)), els.list.children[idx] || null);
+    if (e.tc.length > 5) els.list.classList.add('wide');
+  } else if (!els.list.querySelector('.row')) { renderList(); return; }
+  ensureTabStop();
+}
+
+function renderBackupStatus() {
+  const n = byId.size;
+  const last = state.meta.lastBackupAt;
+  let unsaved = 0;
+  if (last) for (const e of byId.values()) if ((e.updatedAt || e.createdAt) > last) unsaved++;
+  let line1, warn = false;
+  if (!last) { line1 = n ? 'Резервная копия ещё не создавалась' : 'Резервных копий пока нет'; warn = n > 0; }
+  else {
+    const days = dayDiff(iso(new Date(last)), todayISO());
+    line1 = days === 0 ? 'Копия сохранена сегодня' : days === 1 ? 'Копия сохранена вчера' : `Копия сохранена ${days} ${plural(days, 'день', 'дня', 'дней')} назад`;
+    if (unsaved && (days >= 7 || unsaved >= 50)) warn = true;
+  }
+  els.backup.classList.toggle('warn', warn);
+  els.backup.innerHTML = `<div>${line1}</div>${last && unsaved ? `<div>В неё не вошло: ${unsaved} ${plural(unsaved, 'запись', 'записи', 'записей')}</div>` : ''}`;
+}
+
+function renderHint() {
+  els.hint.innerHTML = `
+    <span><kbd>Enter</kbd> сохранить</span>
+    <span><kbd>Пробел</kbd> к описанию</span>
+    <span><kbd>Ctrl</kbd>+<kbd>Z</kbd> отменить</span>`;
+}
+
+const renderAll = () => { renderBanner(); renderCalendar(); renderHead(); renderList(); renderBackupStatus(); renderSyncStatus(); };
+const renderSide = () => { renderCalendar(); renderHead(); renderBackupStatus(); };
+
+/* =====================================================================
+   Выбор даты
+   ===================================================================== */
+function selectDate(date, { focus = true } = {}) {
+  if (!parseISO(date)) return;
+  closeSide();
+  state.edit = null;
+  state.selected = date;
+  const d = parseISO(date);
+  state.viewY = d.getFullYear(); state.viewM = d.getMonth();
+  clearAddError();
+  renderCalendar(); renderHead(); renderList({ keepScroll: false });
+  dbSetMeta('lastDate', date).catch(() => {});
+  if (focus) focusTc();
+}
+function shiftMonth(delta) {
+  const d = new Date(state.viewY, state.viewM + delta, 1);
+  state.viewY = d.getFullYear(); state.viewM = d.getMonth();
+  renderCalendar();
+}
+
+/* =====================================================================
+   Добавление
+   ===================================================================== */
+let savedTimer = null;
+function showSaved(text) {
+  els.saved.innerHTML = `${ic('check')}<span></span>`;
+  els.saved.lastChild.textContent = text;
+  els.saved.classList.add('on');
+  clearTimeout(savedTimer);
+  savedTimer = setTimeout(() => els.saved.classList.remove('on'), 1800);
+}
+function setAddError(msg) {
+  els.addbar.classList.add('err');
+  els.hint.innerHTML = '<span class="errmsg"></span>';
+  els.hint.firstChild.textContent = msg;
+}
+function clearAddError() {
+  if (!els.addbar.classList.contains('err')) return;
+  els.addbar.classList.remove('err');
+  renderHint();
+}
+
+let addChain = Promise.resolve();
+function submitAdd() {
+  if (!state.storageOk) return;
+  const p = parseTimecode(els.tc.value);
+  if (!p.ok) { setAddError(p.msg); els.tc.focus(); els.tc.select(); return; }
+  clearAddError();
+  clearTimeout(savedTimer); els.saved.classList.remove('on');   // старое «Сохранено» не должно соседствовать с новой попыткой
+  const e = { id: newId(), date: state.selected, tc: p.tc, sec: p.sec, text: els.desc.value.trim(), createdAt: nextStamp() };
+  const snap = { tc: els.tc.value, text: els.desc.value };
+  els.tc.value = ''; els.desc.value = '';
+  els.tc.focus();
+  state.pending++;
+  addChain = addChain.then(async () => {
+    try {
+      await dbPut(e);
+      idxPut(e);
+      undoPush({ type: 'add', after: e });
+      localChanged();
+      if (e.date === state.selected) { syncRow(e.id); flashRow(e.id, false); }
+      renderCalendar(); renderHead(); renderBackupStatus();
+      showSaved(`Сохранено ${e.tc}`);
+    } catch (err) {
+      const label = `${e.tc}${e.text ? ' — ' + e.text : ''}`;
+      if (!els.tc.value && !els.desc.value) { els.tc.value = snap.tc; els.desc.value = snap.text; }
+      toast(`Не сохранено: ${label}. Причина: ${reasonOf(err)}. Запись не добавлена — повтори позже или сделай резервную копию.`, { kind: 'error' });
+    } finally { state.pending--; }
+  });
+}
+
+/* =====================================================================
+   Правка, удаление, отмена
+   ===================================================================== */
+function startEdit(id) {
+  const e = byId.get(id); if (!e) return;
+  const prev = state.edit && state.edit.id;
+  state.edit = { id, tc: e.tc, text: e.text, err: '' };
+  if (prev && prev !== id) syncRow(prev);
+  syncRow(id);
+  const row = findRow(id);
+  const inp = row && $('.e-tc', row);
+  if (inp) { inp.focus(); inp.select(); }
+}
+function cancelEdit() {
+  if (!state.edit) return;
+  const id = state.edit.id;
+  state.edit = null; syncRow(id); focusTc();
+}
+async function saveEdit() {
+  const ed = state.edit; if (!ed) return;
+  const old = byId.get(ed.id);
+  if (!old) { state.edit = null; renderList(); return; }
+  const p = parseTimecode(ed.tc);
+  const row = findRow(ed.id);
+  if (!p.ok) {
+    ed.err = p.msg;
+    if (row) { const er = $('.e-err', row); er.hidden = false; er.textContent = p.msg; $('.e-tc', row).classList.add('bad'); $('.e-tc', row).focus(); }
+    return;
+  }
+  const text = ed.text.trim();
+  if (p.tc === old.tc && text === old.text) { cancelEdit(); return; }
+  const upd = { ...old, tc: p.tc, sec: p.sec, text, updatedAt: nextStamp() };
+  state.pending++;
+  try { await dbPut(upd); }
+  catch (err) {
+    state.pending--;
+    ed.err = `Не удалось сохранить: ${reasonOf(err)}`;
+    if (row) { const er = $('.e-err', row); er.hidden = false; er.textContent = ed.err; }
+    toast(`Изменения не сохранены. Причина: ${reasonOf(err)}`, { kind: 'error' });
+    return;
+  }
+  state.pending--;
+  idxPut(upd);
+  undoPush({ type: 'edit', before: old, after: upd });
+  localChanged();
+  state.edit = null;
+  syncRow(upd.id); flashRow(upd.id, false); renderBackupStatus();
+  showSaved('Изменено');
+  focusTc();
+}
+
+async function deleteEntry(id, { focusId = null } = {}) {
+  const e = byId.get(id); if (!e) return;
+  state.pending++;
+  try { await dbDel(e, nextStamp()); }
+  catch (err) { state.pending--; toast(`Не удалось удалить. Причина: ${reasonOf(err)}`, { kind: 'error' }); return; }
+  state.pending--;
+  idxDel(id);
+  if (state.edit && state.edit.id === id) state.edit = null;
+  const op = { type: 'delete', before: e };
+  undoPush(op);
+  localChanged();
+  syncRow(id); renderCalendar(); renderHead(); renderBackupStatus();
+  toast('Запись удалена', { ms: 7000, action: { label: 'Отменить', fn: () => undoOp(op) } });
+  const nb = focusId && findRow(focusId);
+  if (nb) nb.focus(); else focusTc();
+}
+
+function undoPush(op) { state.undo.push(op); if (state.undo.length > 200) state.undo.shift(); }
+async function applyUndo(op) {
+  // 'ok' | 'skip' | 'error'
+  try {
+    if (op.type === 'add') {
+      if (!byId.has(op.after.id)) return 'skip';
+      await dbDel(byId.get(op.after.id), nextStamp()); idxDel(op.after.id);
+      if (state.edit && state.edit.id === op.after.id) state.edit = null;
+      syncRow(op.after.id);
+      toast(`Отменено добавление ${op.after.tc}`);
+    } else if (op.type === 'delete') {
+      if (byId.has(op.before.id)) return 'skip';
+      const back = { ...op.before, updatedAt: nextStamp() };   // новее «надгробия», чтобы восстановление дошло до других компьютеров
+      await dbPut(back); idxPut(back);
+      toast(`Запись ${back.tc} возвращена`);
+      if (back.date !== state.selected) selectDate(back.date, { focus: false }); else syncRow(back.id);
+      flashRow(back.id, true);
+    } else if (op.type === 'edit') {
+      const cur = byId.get(op.after.id);
+      if (!cur || cur.tc !== op.after.tc || cur.text !== op.after.text) return 'skip';
+      const back = { ...op.before, updatedAt: nextStamp() };
+      await dbPut(back); idxPut(back);
+      toast('Изменение отменено');
+      if (back.date !== state.selected) selectDate(back.date, { focus: false }); else syncRow(back.id);
+      flashRow(back.id, true);
+    }
+  } catch (err) {
+    toast(`Не удалось отменить действие. Причина: ${reasonOf(err)}`, { kind: 'error' });
+    return 'error';
+  }
+  renderCalendar(); renderHead(); renderBackupStatus();
+  localChanged();
+  return 'ok';
+}
+async function undoOp(op) {
+  const i = state.undo.indexOf(op);
+  if (i >= 0) state.undo.splice(i, 1);
+  const r = await applyUndo(op);
+  if (r === 'error' && i >= 0) state.undo.push(op);
+  if (r === 'skip') toast('Это действие уже нельзя отменить');
+}
+async function undoLast() {
+  while (state.undo.length) {
+    const op = state.undo.pop();
+    const r = await applyUndo(op);
+    if (r === 'ok') return;
+    if (r === 'error') { state.undo.push(op); return; }
+  }
+  toast('Нечего отменять');
+}
+
+/* =====================================================================
+   Копирование
+   ===================================================================== */
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); }
+    else throw new Error('no clipboard');
+  } catch (_) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.append(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (__) {}
+    ta.remove();
+    if (!ok) { toast('Не удалось скопировать в буфер обмена', { kind: 'error' }); return; }
+  }
+  toast(`Скопировано: ${text.length > 80 ? text.slice(0, 80) + '…' : text}`, { kind: 'ok', ms: 2000 });
+}
+const fullLine = e => e.text ? `${e.tc} — ${e.text}` : e.tc;
+
+/* =====================================================================
+   Оверлеи: общее
+   ===================================================================== */
+let lastFocus = null;
+function openOverlay(kind) {
+  clearToasts();
+  closeSide(false, true);
+  pushBack();
+  lastFocus = document.activeElement;
+  state.overlay = kind;
+  els.app.inert = true;
+  els.overlay.hidden = false;
+}
+function closeOverlay(fromPop, keep) {
+  const was = !!state.overlay;
+  state.overlay = null; state.imp = null; state.syncUI = null;
+  els.app.inert = false;
+  els.overlay.hidden = true;
+  els.overlay.innerHTML = '';
+  if (was) releaseEntry(fromPop, keep);
+  focusTc();
+}
+els.overlay.addEventListener('mousedown', e => { if (e.target === els.overlay) closeOverlay(); });
+
+/* =====================================================================
+   Поиск
+   ===================================================================== */
+const S = { q: '', words: [], results: [], sel: 0 };
+function normOf(e) {
+  let n = normCache.get(e.id);
+  if (n === undefined) { n = norm(e.text); normCache.set(e.id, n); }
+  return n;
+}
+function runSearch(q) {
+  const words = norm(q).split(/\s+/).filter(Boolean);
+  S.words = words;
+  if (!words.length) return [];
+  const out = [];
+  for (const e of byId.values()) {
+    const n = normOf(e);
+    let ok = true;
+    for (const w of words) {
+      if (n.includes(w)) continue;
+      if (e.tc.includes(w.replace(/[.,]/g, ':'))) continue;
+      ok = false; break;
+    }
+    if (ok) out.push(e);
+  }
+  out.sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (a.sec - b.sec) || (a.createdAt - b.createdAt));
+  return out;
+}
+function highlight(text, words) {
+  const n = norm(text);
+  if (n.length !== text.length) return esc(text);
+  const ranges = [];
+  for (const w of words) {
+    if (!w) continue;
+    let i = 0;
+    while ((i = n.indexOf(w, i)) !== -1) { ranges.push([i, i + w.length]); i += w.length; }
+  }
+  if (!ranges.length) return esc(text);
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [ranges[0].slice()];
+  for (const r of ranges.slice(1)) { const l = merged[merged.length - 1]; if (r[0] <= l[1]) l[1] = Math.max(l[1], r[1]); else merged.push(r.slice()); }
+  let out = '', pos = 0;
+  for (const [a, b] of merged) { out += esc(text.slice(pos, a)) + '<mark>' + esc(text.slice(a, b)) + '</mark>'; pos = b; }
+  return out + esc(text.slice(pos));
+}
+const SEARCH_LIMIT = 300;
+function renderSearchResults() {
+  const box = $('#sres'); if (!box) return;
+  if (!S.words.length) { box.innerHTML = `<div class="s-info">Начни вводить слово, часть слова или таймкод.<br>Поиск идёт по всем датам.</div>`; return; }
+  if (!S.results.length) { box.innerHTML = `<div class="s-info">Ничего не найдено по запросу «${esc(S.q.trim())}»</div>`; return; }
+  const shown = S.results.slice(0, SEARCH_LIMIT);
+  box.innerHTML = `<div class="s-count">Найдено: ${S.results.length}${S.results.length > SEARCH_LIMIT ? `, показаны первые ${SEARCH_LIMIT} — уточни запрос` : ''}</div>` +
+    shown.map((e, i) => `<button type="button" class="res${i === S.sel ? ' sel' : ''}" data-i="${i}" data-id="${esc(e.id)}"><span class="d">${shortDate(e.date)}</span><span class="t">${esc(e.tc)}</span><span class="x">${e.text ? highlight(e.text, S.words) : '<i style="color:var(--faint)">без описания</i>'}</span></button>`).join('');
+}
+function openSearch() {
+  if (state.overlay === 'search') { $('#sq').select(); return; }
+  if (state.overlay) closeOverlay(false, true);
+  openOverlay('search');
+  S.q = ''; S.words = []; S.results = []; S.sel = 0;
+  els.overlay.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Поиск по записям">
+      <div class="s-top">${ic('search')}<input id="sq" type="text" autocomplete="off" spellcheck="false" placeholder="Слово, часть слова или таймкод по всем датам" aria-label="Поиск"><button type="button" class="iconbtn" data-act="close" aria-label="Закрыть">${ic('x')}</button></div>
+      <div class="s-res" id="sres"></div>
+      <div class="s-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> выбрать</span><span><kbd>Enter</kbd> открыть</span><span><kbd>Esc</kbd> закрыть</span></div>
+    </div>`;
+  renderSearchResults();
+  $('#sq').focus();
+}
+function moveSel(delta) {
+  const max = Math.min(S.results.length, SEARCH_LIMIT);
+  if (!max) return;
+  S.sel = (S.sel + delta + max) % max;
+  const items = els.overlay.querySelectorAll('.res');
+  items.forEach((el, i) => el.classList.toggle('sel', i === S.sel));
+  const cur = items[S.sel]; if (cur) cur.scrollIntoView({ block: 'nearest' });
+}
+function goToEntry(id) {
+  const e = byId.get(id); if (!e) return;
+  closeOverlay();
+  state.flashId = id; state.flashCenter = true;
+  selectDate(e.date, { focus: false });
+  focusTc();
+}
+
+/* =====================================================================
+   Экспорт
+   ===================================================================== */
+function allSorted() {
+  return [...byId.values()].sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.sec - b.sec) || (a.createdAt - b.createdAt));
+}
+function exportJSON() {
+  const list = allSorted();
+  const head = JSON.stringify({ app: 'timecode-notes', version: 1, exportedAt: new Date().toISOString(), count: list.length });
+  return head.slice(0, -1) + ',"entries":[\n' + list.map(e => JSON.stringify(e)).join(',\n') + '\n]}\n';
+}
+function exportTXT() {
+  const list = allSorted();
+  const out = []; let cur = null;
+  for (const e of list) {
+    if (e.date !== cur) { if (cur !== null) out.push(''); out.push(longDate(e.date)); cur = e.date; }
+    out.push(fullLine(e));
+  }
+  return out.join('\r\n') + '\r\n';
+}
+function exportCSV() {
+  const q = v => { v = String(v); return /[";\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const ts = ms => { const d = new Date(ms); return `${iso(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+  const rows = [['Дата', 'Таймкод', 'Описание', 'Добавлено']];
+  for (const e of allSorted()) rows.push([e.date, e.tc, e.text, ts(e.createdAt)]);
+  return '\ufeff' + rows.map(r => r.map(q).join(';')).join('\r\n') + '\r\n';
+}
+const stampName = () => { const d = new Date(); return `${iso(d)}-${pad(d.getHours())}${pad(d.getMinutes())}`; };
+
+async function saveFile(name, mime, ext, text, { forceDownload = false } = {}) {
+  const blob = new Blob([text], { type: mime + ';charset=utf-8' });
+  if (!forceDownload && typeof window.showSaveFilePicker === 'function') {
+    try {
+      const h = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Файл ' + ext.toUpperCase(), accept: { [mime]: ['.' + ext] } }] });
+      const w = await h.createWritable(); await w.write(blob); await w.close();
+      return { ok: true, name: h.name };
+    } catch (err) {
+      if (err && err.name === 'AbortError') return { ok: false, cancelled: true };
+      /* иначе — обычная загрузка */
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.style.display = 'none';
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  return { ok: true, name };
+}
+async function doExport(kind, opts = {}) {
+  if (!byId.size) { toast('Пока нечего экспортировать'); return null; }
+  let r;
+  if (kind === 'json') r = await saveFile(`таймкоды-копия-${stampName()}.json`, 'application/json', 'json', exportJSON(), opts);
+  else if (kind === 'csv') r = await saveFile(`таймкоды-${stampName()}.csv`, 'text/csv', 'csv', exportCSV(), opts);
+  else r = await saveFile(`таймкоды-${stampName()}.txt`, 'text/plain', 'txt', exportTXT(), opts);
+  if (r.cancelled) return r;
+  if (kind === 'json') {
+    state.meta.lastBackupAt = Date.now();
+    dbSetMeta('lastBackupAt', state.meta.lastBackupAt).catch(() => {});
+    renderBackupStatus();
+  }
+  toast(kind === 'json' ? `Резервная копия сохранена: ${r.name}` : `Файл сохранён: ${r.name}`, { kind: 'ok', ms: 4200 });
+  return r;
+}
+
+/* =====================================================================
+   Импорт
+   ===================================================================== */
+function parseBackup(text) {
+  let data;
+  try { data = JSON.parse(text.replace(/^\ufeff/, '')); }
+  catch (_) { return { error: 'Файл не похож на резервную копию: это не JSON.' }; }
+  let arr;
+  if (Array.isArray(data)) arr = data;
+  else if (data && Array.isArray(data.entries)) {
+    if (data.version && data.version > 1) return { error: 'Файл создан более новой версией приложения и не может быть прочитан.' };
+    arr = data.entries;
+  } else return { error: 'В файле нет списка записей («entries»).' };
+
+  const valid = [], issues = [];
+  const seen = new Set(), occ = new Map();
+  let invalid = 0, dupInFile = 0;
+  const bad = (i, why) => { invalid++; if (issues.length < 5) issues.push(`Запись №${i + 1}: ${why}`); };
+  let stamp = 0;
+  arr.forEach((r, i) => {
+    if (!r || typeof r !== 'object' || Array.isArray(r)) return bad(i, 'не объект');
+    if (typeof r.date !== 'string' || !parseISO(r.date) || +r.date.slice(0, 4) < 1900 || +r.date.slice(0, 4) > 2200) return bad(i, 'неверная дата');
+    let p = null;
+    if (typeof r.tc === 'string') { p = parseTimecode(r.tc); if (!p.ok) return bad(i, `неверный таймкод «${r.tc.slice(0, 20)}»`); }
+    if (r.sec !== undefined && r.sec !== null) {
+      if (!Number.isInteger(r.sec) || r.sec < 0) return bad(i, 'неверное число секунд');
+      if (p && p.sec !== r.sec) return bad(i, 'таймкод и секунды не совпадают');
+      if (!p) {
+        const h = Math.floor(r.sec / 3600), m = Math.floor(r.sec % 3600 / 60), s = r.sec % 60;
+        if (h > 99) return bad(i, 'слишком большой таймкод');
+        p = { ok: true, sec: r.sec, tc: h ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}` };
+      }
+    }
+    if (!p) return bad(i, 'нет таймкода');
+    if (r.text !== undefined && r.text !== null && typeof r.text !== 'string') return bad(i, 'описание не текст');
+    const text = (r.text || '').slice(0, 5000);
+    let id = typeof r.id === 'string' && r.id && r.id.length <= 200 ? r.id : null;
+    if (!id) {
+      const base = `${r.date}|${p.sec}|${text}`;
+      const k = (occ.get(base) || 0) + 1; occ.set(base, k);
+      id = 'imp-' + hash53(base + '|' + k);
+    }
+    if (seen.has(id)) { dupInFile++; return; }
+    seen.add(id);
+    let createdAt = Number.isFinite(r.createdAt) && r.createdAt > 0 ? r.createdAt : null;
+    if (!createdAt) createdAt = 1e12 + (++stamp);
+    const e = { id, date: r.date, tc: p.tc, sec: p.sec, text, createdAt };
+    if (Number.isFinite(r.updatedAt) && r.updatedAt > 0) e.updatedAt = r.updatedAt;
+    valid.push(e);
+  });
+  return { valid, invalid, issues, dupInFile, total: arr.length };
+}
+
+function pickImportFile() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    let text;
+    clearToasts({ keepSticky: false });
+    try { text = await f.text(); } catch (err) { toast(`Не удалось прочитать файл: ${reasonOf(err)}`, { kind: 'error', ms: 10000 }); return; }
+    const res = parseBackup(text);
+    if (res.error) { toast(res.error, { kind: 'error', ms: 10000 }); return; }
+    if (!res.valid.length) { toast(`В файле нет ни одной корректной записи (${res.invalid} с ошибками).`, { kind: 'error', ms: 10000 }); return; }
+    const fresh = res.valid.filter(e => !byId.has(e.id));
+    state.imp = { name: f.name, res, fresh, mode: 'merge', confirm: false, backupFirst: true };
+    renderDialog();
+  };
+  inp.click();
+}
+
+async function runImport() {
+  const imp = state.imp; if (!imp) return;
+  const { mode, res, fresh } = imp;
+  try {
+    if (mode === 'merge') {
+      if (fresh.length) await dbPutMany(fresh);
+      for (const e of fresh) { idxPut(e); if (stampOf(e) > state.lastStamp) state.lastStamp = stampOf(e); }
+      toast(`Импорт завершён: добавлено ${fresh.length}, уже было ${res.valid.length - fresh.length}`, { kind: 'ok', ms: 5000 });
+    } else {
+      if (imp.backupFirst && byId.size) {
+        const r = await doExport('json', { forceDownload: true });
+        if (!r || !r.ok) return;
+      }
+      const stamped = state.sync ? res.valid.map(e => ({ ...e, updatedAt: nextStamp() })) : res.valid;   // штамп нужен только для синхронизации
+      await dbReplaceAll(stamped, [...byId.values()], nextStamp());
+      idxReset(stamped);
+      state.undo = []; state.edit = null;
+      toast(`Данные заменены: теперь ${res.valid.length} ${plural(res.valid.length, 'запись', 'записи', 'записей')}`, { kind: 'ok', ms: 5000 });
+    }
+  } catch (err) {
+    toast(`Импорт не выполнен, данные не изменены. Причина: ${reasonOf(err)}`, { kind: 'error' });
+    return;
+  }
+  state.sig = signature();
+  localChanged();
+  closeOverlay();
+  renderAll();
+}
+
+function renderDialog() {
+  const imp = state.imp;
+  let body;
+  if (!imp) {
+    const days = byDate.size, n = byId.size;
+    body = `
+      <div class="dlg-head"><h2>Данные и резервная копия</h2><button type="button" class="iconbtn" data-act="close" aria-label="Закрыть">${ic('x')}</button></div>
+      <div class="dlg-body">
+        <div class="stats">
+          <div class="stat"><b>${n}</b><span>${plural(n, 'запись', 'записи', 'записей')} всего</span></div>
+          <div class="stat"><b>${days}</b><span>${plural(days, 'день', 'дня', 'дней')} с записями</span></div>
+        </div>
+        <div class="dlg-actions">
+          <button type="button" class="btn primary wide" data-act="exp-json">${ic('down')} Сохранить резервную копию (JSON)</button>
+          <button type="button" class="btn" data-act="exp-csv">${ic('file')} Экспорт в CSV (Excel)</button>
+          <button type="button" class="btn" data-act="exp-txt">${ic('file')} Экспорт в текст</button>
+          <button type="button" class="btn wide" data-act="imp-pick">${ic('up')} Восстановить из резервной копии…</button>
+        </div>
+        <div class="note">
+          Записи хранятся в базе данных этого браузера на твоём компьютере и работают без интернета.
+          Если очистить данные браузера (cookies и «данные сайтов»), записи пропадут — поэтому раз в неделю сохраняй резервную копию.
+          ${state.persisted === true ? '<br>Браузер пометил хранилище как постоянное: автоматически его не чистят.' : state.persisted === false ? '<br>Браузер не подтвердил постоянное хранение, поэтому регулярные резервные копии особенно важны.' : ''}
+        </div>
+      </div>`;
+  } else {
+    const { res, fresh, mode, confirm } = imp;
+    const dup = res.valid.length - fresh.length;
+    const issuesHtml = res.invalid ? `<p>Не удалось прочитать записей: <b>${res.invalid}</b>. Они будут пропущены.</p><ul class="issues">${res.issues.map(s => `<li>${esc(s)}</li>`).join('')}</ul>` : '';
+    if (confirm) {
+      body = `
+        <div class="dlg-head"><h2>Заменить все данные?</h2><button type="button" class="iconbtn" data-act="close" aria-label="Закрыть">${ic('x')}</button></div>
+        <div class="dlg-body">
+          <div class="warnbox">Все текущие записи (<b>${byId.size}</b>) будут удалены и заменены записями из файла (<b>${res.valid.length}</b>).</div>
+          <label class="check"><input type="checkbox" id="bk" ${imp.backupFirst ? 'checked' : ''}> Сначала скачать копию текущих данных</label>
+          <div class="dlg-foot">
+            <button type="button" class="btn" data-act="imp-back">Назад</button>
+            <button type="button" class="btn danger" data-act="imp-go">Да, заменить все данные</button>
+          </div>
+        </div>`;
+    } else {
+      body = `
+        <div class="dlg-head"><h2>Восстановление из файла</h2><button type="button" class="iconbtn" data-act="close" aria-label="Закрыть">${ic('x')}</button></div>
+        <div class="dlg-body">
+          <p>Файл <b>${esc(imp.name)}</b></p>
+          <div class="stats">
+            <div class="stat"><b>${res.valid.length}</b><span>записей в файле</span></div>
+            <div class="stat"><b>${fresh.length}</b><span>новых для этого компьютера</span></div>
+            <div class="stat"><b>${dup}</b><span>уже есть здесь</span></div>
+          </div>
+          ${issuesHtml}
+          <label class="radio"><input type="radio" name="mode" value="merge" ${mode === 'merge' ? 'checked' : ''}><span><b>Объединить</b> — добавить недостающие записи, ничего не удаляя. Записи с одинаковой датой или таймкодом не сливаются.</span></label>
+          <label class="radio"><input type="radio" name="mode" value="replace" ${mode === 'replace' ? 'checked' : ''}><span><b>Заменить всё</b> — удалить текущие записи и загрузить записи из файла.</span></label>
+          <div class="dlg-foot">
+            <button type="button" class="btn" data-act="imp-cancel">Назад</button>
+            <button type="button" class="btn ${mode === 'replace' ? 'danger' : 'primary'}" data-act="imp-next">${mode === 'replace' ? 'Заменить…' : (fresh.length ? `Добавить ${fresh.length}` : 'Готово')}</button>
+          </div>
+        </div>`;
+    }
+  }
+  els.overlay.innerHTML = `<div class="modal narrow" role="dialog" aria-modal="true" aria-label="Данные и резервная копия">${body}</div>`;
+}
+function openData() {
+  if (state.overlay) closeOverlay(false, true);
+  openOverlay('data');
+  state.imp = null;
+  renderDialog();
+  const first = els.overlay.querySelector('.btn'); if (first) first.focus();
+  if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(v => { state.persisted = v; if (state.overlay === 'data' && !state.imp) renderDialog(); }).catch(() => {});
+}
+
+/* =====================================================================
+   Синхронизация между компьютерами (Supabase, бесплатный тариф)
+
+   Как это устроено:
+   - каждое локальное изменение (добавление, правка, удаление) попадает в очередь в той же транзакции, что и сама запись;
+   - очередь отправляется в Supabase функцией tc_sync_push, новое с других компьютеров забирается функцией tc_sync_pull;
+   - при расхождении побеждает более новая версия записи (по штампу updated_at); удаление — это запись-«надгробие»;
+   - без интернета очередь копится и уходит при первой возможности. Локальная база остаётся главной.
+   ===================================================================== */
+const SYNC_SQL = "-- ТАЙМКОДЫ: настройка синхронизации между компьютерами.\n-- Выполнить ОДИН раз: Supabase -> SQL Editor -> New query -> вставить весь текст -> Run.\n-- Скрипт можно запускать повторно, ничего не сломается и данные не удалятся.\n\n-- 1. Таблица записей. Поле workspace — это «код синхронизации»: он разделяет данные разных пользователей.\ncreate table if not exists public.timecode_entries (\n  workspace   text    not null,\n  id          text    not null,\n  entry_date  text    not null,\n  tc          text    not null,\n  sec         integer not null,\n  note        text    not null default '',\n  created_at  bigint  not null,\n  updated_at  bigint  not null,\n  deleted     boolean not null default false,\n  server_seq  bigint  not null default 0,\n  primary key (workspace, id)\n);\n\ncreate sequence if not exists public.timecode_seq;\n\ncreate index if not exists timecode_entries_seq_idx\n  on public.timecode_entries (workspace, server_seq);\n\n-- 2. Закрываем таблицу от прямого доступа через публичный ключ.\n--    Читать и писать можно только через две функции ниже, и только зная код синхронизации.\nalter table public.timecode_entries enable row level security;\nrevoke all on table public.timecode_entries from anon, authenticated;\n\n-- 3. Отправка изменений. Побеждает более новая версия записи (по updated_at).\ncreate or replace function public.tc_sync_push(p_ws text, p_rows jsonb)\nreturns bigint\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  r jsonb;\n  max_seq bigint;\nbegin\n  if p_ws is null or length(p_ws) < 16 then\n    raise exception 'bad sync code';\n  end if;\n  if jsonb_typeof(p_rows) <> 'array' or jsonb_array_length(p_rows) > 1000 then\n    raise exception 'bad rows';\n  end if;\n\n  for r in select elem from jsonb_array_elements(p_rows) as elem loop\n    insert into public.timecode_entries as t\n      (workspace, id, entry_date, tc, sec, note, created_at, updated_at, deleted, server_seq)\n    values\n      (p_ws, r->>'id', r->>'entry_date', r->>'tc', (r->>'sec')::integer, coalesce(r->>'note', ''),\n       (r->>'created_at')::bigint, (r->>'updated_at')::bigint, coalesce((r->>'deleted')::boolean, false),\n       nextval('public.timecode_seq'))\n    on conflict (workspace, id) do update\n      set entry_date = excluded.entry_date,\n          tc         = excluded.tc,\n          sec        = excluded.sec,\n          note       = excluded.note,\n          created_at = excluded.created_at,\n          updated_at = excluded.updated_at,\n          deleted    = excluded.deleted,\n          server_seq = nextval('public.timecode_seq')\n      where excluded.updated_at >= t.updated_at;\n  end loop;\n\n  select coalesce(max(e.server_seq), 0) into max_seq\n  from public.timecode_entries e\n  where e.workspace = p_ws;\n\n  return max_seq;\nend;\n$$;\n\n-- 4. Получение изменений, появившихся после указанного номера (p_after).\ncreate or replace function public.tc_sync_pull(p_ws text, p_after bigint default 0, p_limit integer default 1000)\nreturns table (\n  id          text,\n  entry_date  text,\n  tc          text,\n  sec         integer,\n  note        text,\n  created_at  bigint,\n  updated_at  bigint,\n  deleted     boolean,\n  server_seq  bigint\n)\nlanguage sql\nstable\nsecurity definer\nset search_path = public\nas $$\n  select e.id, e.entry_date, e.tc, e.sec, e.note, e.created_at, e.updated_at, e.deleted, e.server_seq\n  from public.timecode_entries e\n  where length(p_ws) >= 16\n    and e.workspace = p_ws\n    and e.server_seq > p_after\n  order by e.server_seq\n  limit least(greatest(p_limit, 1), 2000);\n$$;\n\n-- 5. Разрешаем вызывать только эти две функции.\nrevoke all on function public.tc_sync_push(text, jsonb) from public;\nrevoke all on function public.tc_sync_pull(text, bigint, integer) from public;\ngrant execute on function public.tc_sync_push(text, jsonb) to anon, authenticated;\ngrant execute on function public.tc_sync_pull(text, bigint, integer) to anon, authenticated;\n\n-- 6. Просим Supabase сразу увидеть новые функции.\nnotify pgrst, 'reload schema';\n";
+state.sync = null;                       // { url, key, code, cursor } или null, если синхронизация выключена
+state.syncStatus = { kind: 'off' };      // off | busy | ok | error
+state.queueCount = 0;
+state.syncUI = null;
+
+const SYNC_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const genSyncCode = () => { const b = new Uint8Array(24); crypto.getRandomValues(b); let s = ''; for (const x of b) s += SYNC_ALPHABET[x & 31]; return s; };
+const canonCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const prettyCode = c => canonCode(c).replace(/(.{4})(?=.)/g, '$1-');
+function normUrl(u) {
+  u = String(u || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '').replace(/\/+$/, '');
+  try {
+    const x = new URL(u);
+    const local = x.hostname === 'localhost' || x.hostname === '127.0.0.1';
+    if (x.protocol !== 'https:' && !(local && x.protocol === 'http:')) return null;
+    return x.origin;
+  } catch (_) { return null; }
+}
+function ago(ms) {
+  const m = Math.floor((Date.now() - ms) / 60000);
+  if (m < 1) return 'только что';
+  if (m < 60) return `${m} мин назад`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} ч назад`;
+  const d = Math.floor(h / 24);
+  return `${d} ${plural(d, 'день', 'дня', 'дней')} назад`;
+}
+
+class SyncError extends Error {
+  constructor(kind, msg) { super(msg); this.kind = kind; this.syncMsg = msg; }
+}
+async function rpc(cfg, fn, body) {
+  const headers = { 'Content-Type': 'application/json', apikey: cfg.key };
+  // Новые ключи (sb_publishable_…) — не JWT и в Authorization не передаются; старый anon-ключ — JWT и передаётся.
+  if (/^eyJ/.test(cfg.key)) headers.Authorization = 'Bearer ' + cfg.key;
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), 25000);
+  let res;
+  try {
+    res = await fetch(`${cfg.url}/rest/v1/rpc/${fn}`, { method: 'POST', headers, body: JSON.stringify(body), signal: ctrl.signal });
+  } catch (_) {
+    throw new SyncError('offline', navigator.onLine === false ? 'Нет подключения к интернету.' : 'Нет связи с сервером Supabase. Проверьте интернет и адрес проекта.');
+  } finally { clearTimeout(to); }
+  if (res.ok) {
+    try { return await res.json(); } catch (_) { throw new SyncError('bad', 'Сервер вернул непонятный ответ.'); }
+  }
+  let info = {};
+  try { info = await res.json(); } catch (_) {}
+  const msg = String((info && info.message) || '');
+  if (res.status === 401 || res.status === 403) throw new SyncError('auth', 'Сервер не принял ключ. Вставьте ключ проекта целиком (publishable, sb_publishable_…, или anon).');
+  if (res.status === 404 || (info && info.code === 'PGRST202')) {
+    if ((info && info.code === 'PGRST202') || /function/i.test(msg)) throw new SyncError('nofn', 'В проекте нет функций синхронизации. Выполните SQL-скрипт из шага 1 (SQL Editor → Run) и повторите.');
+    throw new SyncError('url', 'Адрес проекта не найден. Проверьте Project URL.');
+  }
+  if (res.status === 400 && /sync code/i.test(msg)) throw new SyncError('code', 'Неверный код синхронизации (нужно не меньше 16 символов).');
+  if (res.status === 429) throw new SyncError('rate', 'Слишком много запросов. Синхронизация повторится позже.');
+  if (res.status >= 500) throw new SyncError('down', 'Проект Supabase не отвечает. Бесплатные проекты засыпают после недели без обращений: откройте supabase.com/dashboard и нажмите «Restore project». Данные при этом сохраняются.');
+  throw new SyncError('http', `Ошибка сервера (${res.status})${msg ? ': ' + msg.slice(0, 120) : ''}`);
+}
+
+/* ---- очередь и служебные записи в локальной базе ---- */
+const dbQueueAll = () => new Promise((resolve, reject) => {
+  try { const t = db.transaction('sync_queue', 'readonly'); const r = t.objectStore('sync_queue').getAll(); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }
+  catch (e) { reject(e); }
+});
+const dbQueueCount = () => new Promise((resolve, reject) => {
+  try { const t = db.transaction('sync_queue', 'readonly'); const r = t.objectStore('sync_queue').count(); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }
+  catch (e) { reject(e); }
+});
+const dbQueueDropIfSame = items => txRun('sync_queue', 'readwrite', t => {
+  const qs = t.objectStore('sync_queue');
+  for (const it of items) { const rq = qs.get(it.id); rq.onsuccess = () => { if (rq.result && rq.result.t === it.t) qs.delete(it.id); }; }
+});
+const dbEnqueueAll = list => txRun('sync_queue', 'readwrite', t => { const q = t.objectStore('sync_queue'); for (const e of list) q.put({ id: e.id, op: 'upsert', t: stampOf(e) }); });
+const dbClearQueue = () => txRun('sync_queue', 'readwrite', t => { t.objectStore('sync_queue').clear(); });
+const dbSaveSync = cfg => txRun('meta', 'readwrite', t => { t.objectStore('meta').put({ key: 'sync', value: cfg }); });
+const dbApplyRemote = (puts, dels, dropQ, cfg) => txRun(['entries', 'sync_queue', 'meta'], 'readwrite', t => {
+  const es = t.objectStore('entries'), qs = t.objectStore('sync_queue');
+  for (const e of puts) es.put(e);
+  for (const id of dels) es.delete(id);
+  for (const id of dropQ) qs.delete(id);
+  t.objectStore('meta').put({ key: 'sync', value: cfg });
+});
+function refreshQueueCount() {
+  if (!db) return;
+  dbQueueCount().then(n => { state.queueCount = n; renderSyncStatus(); }).catch(() => {});
+}
+
+/* ---- преобразование записи <-> строка таблицы ---- */
+const toRow = (e, deleted, updated) => ({ id: e.id, entry_date: e.date, tc: e.tc, sec: e.sec, note: e.text, created_at: e.createdAt, updated_at: updated, deleted });
+function fromRow(r) {
+  if (!r || typeof r.id !== 'string' || !r.id || r.id.length > 200) return null;
+  if (typeof r.entry_date !== 'string' || !parseISO(r.entry_date)) return null;
+  const p = parseTimecode(String(r.tc));
+  if (!p.ok || Number(r.sec) !== p.sec) return null;
+  const createdAt = Number(r.created_at);
+  if (!Number.isFinite(createdAt) || createdAt <= 0) return null;
+  const e = { id: r.id, date: r.entry_date, tc: p.tc, sec: p.sec, text: String(r.note == null ? '' : r.note).slice(0, 5000), createdAt };
+  const u = Number(r.updated_at);
+  if (Number.isFinite(u) && u > 0 && u !== createdAt) e.updatedAt = u;
+  return e;
+}
+const sameEntry = (a, b) => a.date === b.date && a.tc === b.tc && a.sec === b.sec && a.text === b.text && a.createdAt === b.createdAt && stampOf(a) === stampOf(b);
+
+/* ---- отправка и получение ---- */
+async function syncPush(cfg) {
+  for (let guard = 0; guard < 200; guard++) {
+    const items = (await dbQueueAll()).slice(0, 400);
+    if (!items.length) return;
+    const rows = [];
+    for (const it of items) {
+      if (it.op === 'delete' && it.entry) rows.push(toRow(it.entry, true, it.t));
+      else { const e = byId.get(it.id); if (e) rows.push(toRow(e, false, stampOf(e))); }
+    }
+    if (rows.length) await rpc(cfg, 'tc_sync_push', { p_ws: cfg.code, p_rows: rows });
+    await dbQueueDropIfSame(items);
+  }
+}
+async function applyRemote(cfg, rows) {
+  const queue = new Map((await dbQueueAll()).map(q => [q.id, q]));
+  const puts = [], dels = [], dropQ = [];
+  let cursor = cfg.cursor || 0;
+  for (const r of rows) {
+    const seq = Number(r.server_seq);
+    if (Number.isFinite(seq) && seq > cursor) cursor = seq;
+    const u = Number(r.updated_at);
+    if (!Number.isFinite(u)) continue;
+    if (u > state.lastStamp) state.lastStamp = u;          // свои следующие правки всегда новее увиденного
+    const local = byId.get(r.id), q = queue.get(r.id);
+    const localStamp = q ? q.t : (local ? stampOf(local) : -1);
+    if (u < localStamp) continue;                           // локальная версия новее — оставляем, она уйдёт на сервер
+    if (r.deleted === true) {
+      if (local) dels.push(r.id);
+      if (q) dropQ.push(r.id);
+      continue;
+    }
+    const e = fromRow(r);
+    if (!e) continue;                                       // повреждённую строку пропускаем
+    if (!local || !sameEntry(local, e)) puts.push(e);
+    if (q) dropQ.push(r.id);
+  }
+  const prev = cfg.cursor;
+  cfg.cursor = cursor;
+  try { await dbApplyRemote(puts, dels, dropQ, cfg); }
+  catch (err) { cfg.cursor = prev; throw err; }
+  for (const e of puts) idxPut(e);
+  for (const id of dels) idxDel(id);
+  if (puts.length || dels.length) {
+    if (state.edit && !byId.has(state.edit.id)) state.edit = null;
+    state.sig = signature();
+    renderCalendar(); renderHead(); renderList(); renderBackupStatus();
+  }
+}
+async function syncPull(cfg) {
+  for (let guard = 0; guard < 500; guard++) {
+    if (state.sync !== cfg) return;
+    const rows = await rpc(cfg, 'tc_sync_pull', { p_ws: cfg.code, p_after: cfg.cursor || 0, p_limit: 1000 });
+    if (!Array.isArray(rows)) throw new SyncError('bad', 'Сервер вернул непонятный ответ.');
+    if (!rows.length) return;
+    await applyRemote(cfg, rows);
+    if (rows.length < 1000) return;
+  }
+}
+
+let syncRunning = false, syncAgain = false, syncTimer = null;
+function scheduleSync(ms = 1200) {
+  if (!state.sync) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncNow(), ms);
+}
+async function syncNow() {
+  const cfg = state.sync;
+  if (!cfg || !state.storageOk) return;
+  if (syncRunning) { syncAgain = true; return; }
+  syncRunning = true;
+  state.syncStatus = { kind: 'busy' };
+  renderSyncStatus();
+  try {
+    await syncPush(cfg);
+    await syncPull(cfg);
+    state.syncStatus = { kind: 'ok', at: Date.now() };
+  } catch (err) {
+    state.syncStatus = { kind: 'error', msg: err.syncMsg || `Ошибка: ${reasonOf(err)}`, at: Date.now() };
+  } finally {
+    syncRunning = false;
+    try { state.queueCount = await dbQueueCount(); } catch (_) {}
+    renderSyncStatus();
+    if (state.overlay === 'sync' && state.syncUI && state.syncUI.view === 'status') renderSyncDialog();
+    if (syncAgain) { syncAgain = false; scheduleSync(300); }
+  }
+}
+const localChanged = () => { if (state.sync) { refreshQueueCount(); scheduleSync(1200); } };
+
+async function disableSync() {
+  clearTimeout(syncTimer);
+  state.sync = null;
+  state.syncStatus = { kind: 'off' };
+  try { await dbSaveSync(null); await dbClearQueue(); } catch (_) {}
+  state.queueCount = 0;
+  renderSyncStatus();
+}
+
+/* ---- статус в боковой панели ---- */
+function renderSyncStatus() {
+  const b = $('#btnSync');
+  if (!b) return;
+  const s = state.syncStatus, n = state.queueCount || 0;
+  let title, line = '', cls = 'off';
+  if (!state.sync) { title = 'Синхронизация между ПК'; line = 'не настроена'; }
+  else if (s.kind === 'busy') { title = 'Синхронизация…'; cls = 'busy'; if (n) line = `к отправке: ${n}`; }
+  else if (s.kind === 'error') { title = 'Нет синхронизации'; cls = 'err'; line = s.msg || ''; if (n) line = `Ждут отправки: ${n}. ` + line; }
+  else { title = 'Синхронизировано'; cls = 'ok'; line = s.at ? ago(s.at) : ''; if (n) line = `Ждут отправки: ${n}`; }
+  b.className = 'syncbtn ' + cls;
+  b.title = state.sync && s.kind === 'error' ? (s.msg || '') : 'Синхронизация между компьютерами';
+  b.innerHTML = `<span class="sdot"></span><span class="st"><b></b><span></span></span>`;
+  b.querySelector('b').textContent = title;
+  b.querySelector('.st > span').textContent = line;
+}
+
+/* ---- окно настройки ---- */
+function openSyncDialog() {
+  if (state.overlay) closeOverlay(false, true);
+  openOverlay('sync');
+  state.syncUI = { view: state.sync ? 'status' : 'setup', err: '', busy: false, draft: { url: '', key: '', code: '' }, showCode: false, confirmOff: false };
+  renderSyncDialog();
+  const f = els.overlay.querySelector('input'); if (f) f.focus();
+}
+function renderSyncDialog() {
+  const ui = state.syncUI;
+  if (!ui || state.overlay !== 'sync') return;
+  const head = `<div class="dlg-head"><h2>Синхронизация между компьютерами</h2><button type="button" class="iconbtn" data-act="close" aria-label="Закрыть">${ic('x')}</button></div>`;
+  let body;
+  if (ui.view === 'setup') {
+    const d = ui.draft;
+    body = `${head}
+    <div class="dlg-body">
+      <p>Записи будут храниться ещё и в вашем бесплатном проекте Supabase и появятся на любом компьютере, где введены те же адрес, ключ и код.</p>
+      <ol class="steps">
+        <li><b>Создайте проект и выполните скрипт.</b> Зарегистрируйтесь на supabase.com, создайте проект (New project, бесплатный тариф), откройте SQL Editor, вставьте скрипт и нажмите Run.
+          <div class="inline-actions"><button type="button" class="btn" data-act="sync-copy-sql">${ic('copy')} Скопировать SQL-скрипт</button></div>
+          <details><summary>Показать скрипт</summary><pre class="sql">${esc(SYNC_SQL)}</pre></details>
+        </li>
+        <li><b>Скопируйте адрес и ключ проекта.</b> Адрес (Project URL) и publishable-ключ (начинается с sb_publishable_) есть в настройках проекта: Project Settings → API Keys, также по кнопке Connect.
+          <div class="field"><label for="sf-url">Project URL</label><input id="sf-url" data-sf="url" type="text" autocomplete="off" spellcheck="false" placeholder="https://xxxxxxxx.supabase.co" value="${esc(d.url)}"></div>
+          <div class="field"><label for="sf-key">Publishable (или anon) ключ</label><input id="sf-key" data-sf="key" type="text" autocomplete="off" spellcheck="false" placeholder="sb_publishable_…" value="${esc(d.key)}"></div>
+        </li>
+        <li><b>Код синхронизации.</b> На первом компьютере нажмите «Создать код» и сохраните его. На втором введите тот же адрес, ключ и код. Код работает как пароль: у кого он есть, тот видит ваши таймкоды.
+          <div class="field"><label for="sf-code">Код синхронизации</label>
+            <div class="row2"><input id="sf-code" class="codebox" data-sf="code" type="text" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" value="${esc(d.code)}"><button type="button" class="btn" data-act="sync-gen-code">Создать код</button></div>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="dlg-fixed">
+      <div class="warnbox" ${ui.err ? '' : 'hidden'} role="alert">${esc(ui.err)}</div>
+      <div class="dlg-foot"><button type="button" class="btn" data-act="close">Закрыть</button><button type="button" class="btn primary" data-act="sync-enable" ${ui.busy ? 'disabled' : ''}>${ui.busy ? 'Проверяю…' : 'Включить синхронизацию'}</button></div>
+    </div>`;
+  } else {
+    const s = state.syncStatus, n = state.queueCount || 0;
+    const stText = s.kind === 'busy' ? 'идёт…' : s.kind === 'error' ? 'ошибка' : s.at ? 'в порядке' : '…';
+    body = `${head}
+    <div class="dlg-body">
+      <div class="stats">
+        <div class="stat"><b>${stText}</b><span>${s.kind === 'ok' && s.at ? 'последняя синхронизация: ' + ago(s.at) : 'состояние'}</span></div>
+        <div class="stat"><b>${n}</b><span>${plural(n, 'изменение ждёт', 'изменения ждут', 'изменений ждут')} отправки</span></div>
+      </div>
+      ${s.kind === 'error' ? `<div class="warnbox" role="alert">${esc(s.msg || '')}</div>` : ''}
+      <p>Проект: <b>${esc(state.sync.url.replace(/^https?:\/\//, ''))}</b></p>
+      <p>Код синхронизации: <b class="codebox">${ui.showCode ? esc(prettyCode(state.sync.code)) : '••••-••••-••••-••••-••••-••••'}</b></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn primary wide" data-act="sync-now">Синхронизировать сейчас</button>
+        <button type="button" class="btn" data-act="sync-show">${ui.showCode ? 'Скрыть код' : 'Показать код'}</button>
+        <button type="button" class="btn" data-act="sync-copy-code">Копировать код</button>
+        <button type="button" class="btn" data-act="sync-full" title="Заново сверить все записи с сервером">Полная сверка</button>
+        ${ui.confirmOff
+          ? `<button type="button" class="btn danger" data-act="sync-off-go">Да, отключить</button>`
+          : `<button type="button" class="btn" data-act="sync-off">Отключить…</button>`}
+      </div>
+      ${ui.confirmOff ? `<div class="warnbox">Синхронизация на этом компьютере остановится. Записи на этом компьютере и на сервере останутся как есть. <button type="button" class="linkbtn" data-act="sync-off-cancel">Передумал</button></div>` : ''}
+      <div class="note">
+        Изменения отправляются автоматически через секунду-две. Новое с других компьютеров подтягивается при запуске, при возврате в окно и примерно раз в 45 секунд.
+        Если интернета нет, изменения копятся и уходят позже. Когда на двух компьютерах изменили одну и ту же запись, остаётся более поздняя правка.<br><br>
+        Бесплатный проект Supabase засыпает после недели без обращений. Данные при этом не теряются, а проект возвращается кнопкой «Restore project» в панели Supabase. Регулярные резервные копии (JSON) всё равно полезны.
+      </div>
+    </div>`;
+  }
+  els.overlay.innerHTML = `<div class="modal mid" role="dialog" aria-modal="true" aria-label="Синхронизация между компьютерами">${body}</div>`;
+}
+
+async function enableSync() {
+  const ui = state.syncUI; if (!ui || ui.busy) return;
+  const d = ui.draft;
+  const url = normUrl(d.url), key = String(d.key || '').trim(), code = canonCode(d.code);
+  const fail = msg => { ui.err = msg; ui.busy = false; renderSyncDialog(); };
+  if (!url) return fail('Адрес проекта должен начинаться с https:// и выглядеть как https://xxxxxxxx.supabase.co');
+  if (key.length < 20 || /\s/.test(key)) return fail('Ключ выглядит неполным. Скопируйте его целиком (sb_publishable_… или длинный ключ anon).');
+  if (code.length < 16) return fail('Код синхронизации — не короче 16 символов. Нажмите «Создать код» на первом компьютере или введите код с первого.');
+  ui.busy = true; ui.err = ''; renderSyncDialog();
+  const cfg = { url, key, code, cursor: 0 };
+  try { await rpc(cfg, 'tc_sync_pull', { p_ws: code, p_after: 0, p_limit: 1 }); }
+  catch (err) { return fail(err.syncMsg || `Ошибка: ${reasonOf(err)}`); }
+  try {
+    await dbEnqueueAll([...byId.values()]);      // всё, что уже есть на этом компьютере, уйдёт на сервер
+    await dbSaveSync(cfg);
+    state.sync = cfg;
+  } catch (err) {
+    try { await dbClearQueue(); } catch (_) {}
+    return fail(`Не удалось сохранить настройки: ${reasonOf(err)}`);
+  }
+  ui.view = 'status'; ui.busy = false; ui.err = '';
+  state.syncStatus = { kind: 'busy' };
+  renderSyncDialog(); renderSyncStatus();
+  await syncNow();
+  if (state.syncStatus.kind === 'ok') toast('Синхронизация включена', { kind: 'ok' });
+}
+
+async function syncAction(a) {
+  const ui = state.syncUI; if (!ui) return;
+  if (a === 'sync-copy-sql') { copyText(SYNC_SQL); return; }
+  if (a === 'sync-gen-code') { ui.draft.code = prettyCode(genSyncCode()); const i = $('#sf-code'); if (i) i.value = ui.draft.code; return; }
+  if (a === 'sync-enable') { await enableSync(); return; }
+  if (a === 'sync-now') { await syncNow(); return; }
+  if (a === 'sync-show') { ui.showCode = !ui.showCode; renderSyncDialog(); return; }
+  if (a === 'sync-copy-code') { if (state.sync) copyText(prettyCode(state.sync.code)); return; }
+  if (a === 'sync-off') { ui.confirmOff = true; renderSyncDialog(); return; }
+  if (a === 'sync-off-cancel') { ui.confirmOff = false; renderSyncDialog(); return; }
+  if (a === 'sync-off-go') { await disableSync(); closeOverlay(); toast('Синхронизация отключена'); return; }
+  if (a === 'sync-full') {
+    if (!state.sync) return;
+    try { state.sync.cursor = 0; await dbSaveSync(state.sync); await dbEnqueueAll([...byId.values()]); }
+    catch (err) { toast(`Не удалось запустить сверку: ${reasonOf(err)}`, { kind: 'error' }); return; }
+    await syncNow();
+    return;
+  }
+}
+
+$('#btnSync').addEventListener('click', openSyncDialog);
+setInterval(() => { if (state.sync && !document.hidden) syncNow(); }, 45000);
+setInterval(() => { if (state.sync) renderSyncStatus(); }, 30000);
+
+
+/* =====================================================================
+   События
+   ===================================================================== */
+$('#btnAdd').addEventListener('click', submitAdd);
+$('#btnSearch').addEventListener('click', openSearch);
+$('#btnSideClose').addEventListener('click', () => closeSide());
+$('#btnData').addEventListener('click', openData);
+
+els.tc.addEventListener('input', clearAddError);
+els.desc.addEventListener('input', clearAddError);
+for (const inp of [els.tc, els.desc]) inp.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.isComposing) {
+    e.preventDefault();
+    if (COARSE && inp === els.tc && els.tc.value.trim() && !els.desc.value.trim()) {
+      const p = parseTimecode(els.tc.value);
+      if (!p.ok) { setAddError(p.msg); return; }
+      els.desc.focus(); return;
+    }
+    submitAdd();
+  }
+});
+els.tc.addEventListener('keydown', e => {
+  if (e.key === ' ' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    e.preventDefault();
+    if (!els.tc.value.trim()) return;
+    const p = parseTimecode(els.tc.value);
+    if (!p.ok) { setAddError(p.msg); return; }
+    els.desc.focus();
+  }
+});
+els.tc.addEventListener('paste', e => {
+  const t = (e.clipboardData && e.clipboardData.getData('text')) || '';
+  if (/[\r\n]/.test(t.trim())) return;
+  const m = /^\s*(\d{1,3}(?:[:.,]\d{1,3}){1,2})\s*(?:[—–:\-]\s*|\s+)(\S.*)$/.exec(t);
+  if (!m) return;
+  e.preventDefault();
+  els.tc.value = m[1]; els.desc.value = m[2].trim().slice(0, 1000);
+  clearAddError(); els.desc.focus();
+});
+
+els.cal.addEventListener('click', e => {
+  const day = e.target.closest('.day');
+  if (day) { selectDate(day.dataset.date); return; }
+  const nav = e.target.closest('[data-cal]');
+  if (nav) shiftMonth(nav.dataset.cal === 'next' ? 1 : -1);
+});
+els.cal.addEventListener('keydown', e => {
+  const day = e.target.closest && e.target.closest('.day');
+  if (!day || e.altKey || e.ctrlKey || e.metaKey) return;
+  let target = null;
+  const cur = day.dataset.date;
+  if (e.key === 'ArrowLeft') target = addDays(cur, -1);
+  else if (e.key === 'ArrowRight') target = addDays(cur, 1);
+  else if (e.key === 'ArrowUp') target = addDays(cur, -7);
+  else if (e.key === 'ArrowDown') target = addDays(cur, 7);
+  else if (e.key === 'PageUp' || e.key === 'PageDown') {
+    const d = parseISO(cur); const dir = e.key === 'PageUp' ? -1 : 1;
+    const t = new Date(d.getFullYear(), d.getMonth() + dir, 1);
+    const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+    t.setDate(Math.min(d.getDate(), last)); target = iso(t);
+  }
+  if (!target) return;
+  e.preventDefault();
+  selectDate(target, { focus: false });
+  const b = els.cal.querySelector(`.day[data-date="${target}"]`); if (b) b.focus();
+});
+
+els.head.addEventListener('click', e => {
+  const mob = e.target.closest('[data-mob]');
+  if (mob) { if (mob.dataset.mob === 'cal') openSide(); else openSearch(); return; }
+  const nav = e.target.closest('[data-nav]');
+  if (nav) {
+    const v = nav.dataset.nav;
+    if (v === 'today') { state.today = todayISO(); selectDate(state.today); }
+    else selectDate(addDays(state.selected, +v));
+    return;
+  }
+  const s = e.target.closest('[data-sort]');
+  if (s && s.dataset.sort !== state.sort) {
+    state.sort = s.dataset.sort;
+    dbSetMeta('sort', state.sort).catch(() => {});
+    renderHead(); renderList({ keepScroll: false });
+  }
+});
+
+els.list.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const row = b.closest('.row'); if (!row) return;
+  const id = row.dataset.id, act = b.dataset.act;
+  if (act === 'copy-tc') { const x = byId.get(id); if (x) copyText(x.tc); }
+  else if (act === 'copy-full') { const x = byId.get(id); if (x) copyText(fullLine(x)); }
+  else if (act === 'delete') deleteEntry(id);
+  else if (act === 'save-edit') saveEdit();
+  else if (act === 'cancel-edit') cancelEdit();
+  else if (act === 'edit') startEdit(id);
+});
+let ptrX = -1, ptrY = -1;   // фиктивные события мыши после перестройки списка приходят с теми же координатами — игнорируем их
+els.list.addEventListener('mousemove', e => {
+  if (e.clientX === ptrX && e.clientY === ptrY) return;
+  ptrX = e.clientX; ptrY = e.clientY;
+  moveTools(e.target.closest && e.target.closest('.row'));
+});
+const toolsRowFocused = () => { const r = tools.parentNode; return !!r && (r === document.activeElement || r.contains(document.activeElement)); };
+els.list.addEventListener('mouseleave', () => { if (!toolsRowFocused()) tools.remove(); });
+els.list.addEventListener('focusout', e => {      // на сенсорных экранах кнопки исчезают, когда фокус ушёл с записи
+  if (!(window.matchMedia && matchMedia('(hover:none)').matches)) return;
+  const row = e.target.closest && e.target.closest('.row');
+  if (!row || (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.row'))) return;
+  setTimeout(() => { if (tools.parentNode && !toolsRowFocused()) tools.remove(); }, 0);
+});
+els.list.addEventListener('focusin', e => {
+  const row = e.target.closest && e.target.closest('.row');
+  if (row && e.target === row) {
+    for (const r of els.list.querySelectorAll('.row[tabindex="0"]')) if (r !== row) r.tabIndex = -1;
+    row.tabIndex = 0;
+  }
+  moveTools(row);
+});
+els.list.addEventListener('dblclick', e => {
+  const b = e.target.closest('.chip, .txt'); if (!b) return;
+  const row = b.closest('.row'); if (row && !row.classList.contains('editing')) startEdit(row.dataset.id);
+});
+els.list.addEventListener('input', e => {
+  const f = e.target.dataset && e.target.dataset.f; if (!f || !state.edit) return;
+  state.edit[f] = e.target.value;
+  if (f === 'tc' && state.edit.err) {
+    state.edit.err = '';
+    const row = e.target.closest('.row'); const er = $('.e-err', row); er.hidden = true; e.target.classList.remove('bad');
+  }
+});
+els.list.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.f && e.key === 'Enter' && !e.isComposing) { e.preventDefault(); saveEdit(); return; }
+  // Управление с клавиатуры, когда фокус на самой строке
+  if (t.classList && t.classList.contains('row') && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const n = e.key === 'ArrowDown' ? t.nextElementSibling : t.previousElementSibling;
+      if (n && n.classList.contains('row')) n.focus();
+    } else if (e.key === 'Enter' || e.key === 'F2') { e.preventDefault(); startEdit(t.dataset.id); }
+    else if (e.key === 'Delete') {
+      e.preventDefault();
+      const nb = t.nextElementSibling || t.previousElementSibling;
+      deleteEntry(t.dataset.id, { focusId: nb && nb.classList.contains('row') ? nb.dataset.id : null });
+    }
+  }
+});
+
+els.overlay.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (b) {
+    const a = b.dataset.act;
+    if (a === 'close') closeOverlay();
+    else if (a.startsWith('sync-')) syncAction(a);
+    else if (a === 'exp-json') doExport('json');
+    else if (a === 'exp-csv') doExport('csv');
+    else if (a === 'exp-txt') doExport('txt');
+    else if (a === 'imp-pick') pickImportFile();
+    else if (a === 'imp-cancel') { state.imp = null; renderDialog(); }
+    else if (a === 'imp-back') { state.imp.confirm = false; renderDialog(); }
+    else if (a === 'imp-next') { if (state.imp.mode === 'replace') { state.imp.confirm = true; renderDialog(); } else runImport(); }
+    else if (a === 'imp-go') { const bk = $('#bk'); if (bk) state.imp.backupFirst = bk.checked; runImport(); }
+    return;
+  }
+  const r = e.target.closest('.res');
+  if (r) goToEntry(r.dataset.id);
+});
+els.overlay.addEventListener('change', e => {
+  if (e.target.name === 'mode' && state.imp) { state.imp.mode = e.target.value; renderDialog(); const r = els.overlay.querySelector('input[name=mode]:checked'); if (r) r.focus(); }
+});
+els.overlay.addEventListener('input', e => {
+  if (e.target.id === 'sq') { S.q = e.target.value; S.results = runSearch(S.q); S.sel = 0; renderSearchResults(); }
+  else if (e.target.dataset && e.target.dataset.sf && state.syncUI) state.syncUI.draft[e.target.dataset.sf] = e.target.value;
+});
+els.overlay.addEventListener('keydown', e => {
+  if (state.overlay === 'sync' && e.key === 'Enter' && e.target.dataset && e.target.dataset.sf && !e.isComposing) { e.preventDefault(); enableSync(); return; }
+  if (state.overlay !== 'search' || e.target.id !== 'sq') return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); moveSel(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); moveSel(-1); }
+  else if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); const r = S.results[S.sel]; if (r) goToEntry(r.id); }
+});
+
+document.addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  const t = e.target;
+  const typing = !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+
+  if (mod && !e.altKey && !e.shiftKey && e.code === 'KeyF') { e.preventDefault(); openSearch(); return; }
+
+  if (e.key === 'Escape') {
+    if (state.overlay) { e.preventDefault(); closeOverlay(); return; }
+    if (sideOpen()) { e.preventDefault(); closeSide(); return; }
+    if (state.edit) { e.preventDefault(); cancelEdit(); return; }
+    return;
+  }
+
+  if (mod && !e.altKey && !e.shiftKey && e.code === 'KeyZ') {
+    if (state.overlay) return;
+    if (typing) {
+      const inAdd = t === els.tc || t === els.desc;
+      if (!(inAdd && !els.tc.value && !els.desc.value)) return; // обычная отмена ввода текста
+    }
+    e.preventDefault(); undoLast(); return;
+  }
+
+  if (e.altKey && !mod && (e.code === 'ArrowLeft' || e.code === 'ArrowRight') && !state.overlay) {
+    e.preventDefault();
+    selectDate(addDays(state.selected, e.code === 'ArrowLeft' ? -1 : 1));
+    return;
+  }
+
+  // Цифра при фокусе вне полей — сразу в поле таймкода
+  if (!typing && !mod && !e.altKey && !state.overlay && /^[0-9]$/.test(e.key) && state.storageOk && !(t.closest && t.closest('#calGrid'))) {
+    els.tc.focus();
+  }
+});
+
+window.addEventListener('beforeunload', e => { if (state.pending > 0) { e.preventDefault(); e.returnValue = ''; } });
+
+/* Обновление при возвращении в окно: вдруг данные менялись в другом окне */
+let refreshing = false;
+async function refreshFromDB() {
+  const t = todayISO();
+  if (t !== state.today) { state.today = t; renderSide(); }
+  if (state.sync) scheduleSync(200);
+  if (!state.storageOk || refreshing || state.pending > 0 || state.overlay) return;
+  refreshing = true;
+  try {
+    const all = await dbGetAll();
+    if (state.pending > 0) return;
+    const prev = state.sig;
+    idxReset(all);
+    for (const e of all) if (stampOf(e) > state.lastStamp) state.lastStamp = stampOf(e);
+    const sig = signature();
+    if (sig !== prev) {
+      state.sig = sig;
+      if (state.edit && !byId.has(state.edit.id)) state.edit = null;
+      renderCalendar(); renderHead(); renderList(); renderBackupStatus();
+    }
+  } catch (_) { /* не критично */ }
+  finally { refreshing = false; }
+}
+window.addEventListener('focus', refreshFromDB);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshFromDB(); });
+
+/* =====================================================================
+   Запуск
+   ===================================================================== */
+async function init() {
+  renderHint();
+  try {
+    db = await openDB();
+    state.storageOk = true;
+    const [all, meta] = await Promise.all([dbGetAll(), dbGetMeta()]);
+    idxReset(all);
+    state.meta = meta || {};
+    const sc = meta && meta.sync;
+    if (sc && typeof sc.url === 'string' && typeof sc.key === 'string' && typeof sc.code === 'string') {
+      state.sync = { url: sc.url, key: sc.key, code: sc.code, cursor: Number(sc.cursor) || 0 };
+      state.syncStatus = { kind: 'busy' };
+    }
+    if (meta && (meta.sort === 'tc' || meta.sort === 'new' || meta.sort === 'old')) state.sort = meta.sort;
+    if (meta && typeof meta.lastDate === 'string' && parseISO(meta.lastDate)) state.selected = meta.lastDate;
+    for (const e of all) if (stampOf(e) > state.lastStamp) state.lastStamp = stampOf(e);
+    state.sig = signature();
+  } catch (err) {
+    state.storageOk = false; state.storageErr = reasonOf(err);
+  }
+  const d = parseISO(state.selected);
+  state.viewY = d.getFullYear(); state.viewM = d.getMonth();
+  if (window.matchMedia && matchMedia('(max-width:760px)').matches) els.desc.placeholder = 'Описание';
+  renderAll();
+  if (state.storageOk && state.sync) { refreshQueueCount(); scheduleSync(300); }
+  if (state.storageOk) {
+    focusTc();
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then(v => { state.persisted = v; }).catch(() => {});
+  }
+}
+init();
+
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+</script>
+</body>
+</html>
